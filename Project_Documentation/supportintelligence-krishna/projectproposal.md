@@ -1,5 +1,13 @@
 Project Proposal
 AI-Powered Smart Campus Student Support System
+TEAM LEAD-KRISHNA SUBASH
+FRONT END-RIYA JACOB
+AI DEVELOPER-SAFNA FATHIMA
+CONTENT DEVELOPER-PARVATHY UNNIKRISHNAN
+BACK END-NEHA ZIYAN
+DATABASE AND AUTHENTICATION DEVELOPER-SNEHA SHAJAN
+TESTING/DEPLOYMENT-SHREYA SAGEESH
+
 1. Introduction
 
 The proposed AI-Powered Smart Campus Student Support System is an intelligent platform designed to provide students with quick, personalized, and accessible academic and campus-related support.
