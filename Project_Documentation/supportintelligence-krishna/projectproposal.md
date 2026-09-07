@@ -41,3 +41,57 @@ The system aims to provide a single intelligent platform where students can get 
 7. Future Scope
 
 The system can later be extended with voice-based assistance, multilingual support, timetable integration, LMS integration, placement guidance, and predictive analytics.
+
+Critical Attendance Risk Escalation & AI Engineering Trigger Response
+--------------------------------------------------------------------
+
+{
+  "event_id": "EVT-2026-09-8831",
+  "team": "AI_ENGINEERING",
+  "priority": "CRITICAL",
+  "status": "ESCALATED",
+  "source": "DISASTER_MANAGEMENT_TEAM",
+  "action_required": {
+    "support_tl": true,
+    "trigger_ai_engineering": true,
+    "immediate_intervention": true
+  },
+  "incident_summary": {
+    "anomaly_type": "PROJECTED_EXAM_DEBARMENT",
+    "risk_level": "CRITICAL",
+    "anomaly_confidence": 0.924,
+    "current_attendance_pct": 76.2,
+    "projected_end_sem_attendance_pct": 67.8,
+    "minimum_required_pct": 75.0,
+    "days_to_irreversible_limit": 4
+  },
+  "root_causes": [
+    "Consecutive absence in Subject CS301 for 3 sessions",
+    "Attendance trajectory indicates projected fall below statutory minimum"
+  ],
+  "ai_engineering_tasks": [
+    "Validate the risk prediction and anomaly confidence",
+    "Analyze attendance trajectory and identify intervention window",
+    "Generate recommended preventive actions for the TL",
+    "Prioritize the student for emergency intervention",
+    "Prepare chatbot response and escalation workflow",
+    "Ensure academic advisor notification is triggered"
+  ],
+  "tl_support": {
+    "recommendation": "Immediate academic intervention required",
+    "urgency": "WITHIN_4_DAYS",
+    "suggested_actions": [
+      "Contact student through chatbot",
+      "Notify academic advisor",
+      "Review CS301 attendance and absence pattern",
+      "Initiate corrective attendance plan"
+    ]
+  },
+  "chatbot_action": "TRIGGER_PARENT_EMERGENCY_ALERT",
+  "portal_action": "HIGHLIGHT_ON_FACULTY_CONSOLE",
+  "escalation": {
+    "level": "EMERGENCY",
+    "next_team": "AI_ENGINEERING_TEAM",
+    "requires_tl_acknowledgement": true
+  }
+}
