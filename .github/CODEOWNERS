@@ -1,0 +1,20 @@
+# Global Repository Owners
+* @buildwithsri
+
+# Project Documentation & Architecture
+/docs/ @buildwithsri
+/Project_Documentation/00_project_management/ @buildwithsri
+
+# Module Track Owners
+/Project_Documentation/01_support_intelligence/ @Krishnasubash
+/Project_Documentation/02_academic_evaluation/ @Naisam123
+/Project_Documentation/03_face_recognition/ @roshni2602
+/Project_Documentation/04_disaster_management/ @nihaln9 @AgnanKen
+/Project_Documentation/05_object_detection/ @Jiya
+/Project_Documentation/06_ai_engineering/ @prnnvv
+/Project_Documentation/07_testing_and_qa/ @Mashvik
+
+# Code & Services
+/services/ @buildwithsri @prnnvv
+/notebooks/ @buildwithsri
+/tests/ @Mashvik @buildwithsri
