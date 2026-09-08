@@ -44,6 +44,7 @@ The system can later be extended with voice-based assistance, multilingual suppo
 
 Critical Attendance Risk Escalation & AI Engineering Trigger Response
 --------------------------------------------------------------------
+```
 {
   "event_id": "EVT-2026-09-8831",
   "team": "AI_ENGINEERING",
@@ -103,6 +104,8 @@ Critical Attendance Risk Escalation & AI Engineering Trigger Response
     "requires_tl_acknowledgement": true
   }
 }
+```
+
 ## AI Engineering Trigger Response(README)
 
 The AI Engineering module receives critical alerts from the Disaster Management Team and processes them using NLP-based risk analysis.
