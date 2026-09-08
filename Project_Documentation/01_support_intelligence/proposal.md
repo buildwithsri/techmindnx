@@ -44,18 +44,19 @@ The system can later be extended with voice-based assistance, multilingual suppo
 
 Critical Attendance Risk Escalation & AI Engineering Trigger Response
 --------------------------------------------------------------------
-
 {
   "event_id": "EVT-2026-09-8831",
   "team": "AI_ENGINEERING",
   "priority": "CRITICAL",
   "status": "ESCALATED",
   "source": "DISASTER_MANAGEMENT_TEAM",
+
   "action_required": {
     "support_tl": true,
     "trigger_ai_engineering": true,
     "immediate_intervention": true
   },
+
   "incident_summary": {
     "anomaly_type": "PROJECTED_EXAM_DEBARMENT",
     "risk_level": "CRITICAL",
@@ -65,10 +66,12 @@ Critical Attendance Risk Escalation & AI Engineering Trigger Response
     "minimum_required_pct": 75.0,
     "days_to_irreversible_limit": 4
   },
+
   "root_causes": [
     "Consecutive absence in Subject CS301 for 3 sessions",
     "Attendance trajectory indicates projected fall below statutory minimum"
   ],
+
   "ai_engineering_tasks": [
     "Validate the risk prediction and anomaly confidence",
     "Analyze attendance trajectory and identify intervention window",
@@ -77,9 +80,11 @@ Critical Attendance Risk Escalation & AI Engineering Trigger Response
     "Prepare chatbot response and escalation workflow",
     "Ensure academic advisor notification is triggered"
   ],
+
   "tl_support": {
     "recommendation": "Immediate academic intervention required",
     "urgency": "WITHIN_4_DAYS",
+
     "suggested_actions": [
       "Contact student through chatbot",
       "Notify academic advisor",
@@ -87,11 +92,72 @@ Critical Attendance Risk Escalation & AI Engineering Trigger Response
       "Initiate corrective attendance plan"
     ]
   },
+
   "chatbot_action": "TRIGGER_PARENT_EMERGENCY_ALERT",
+
   "portal_action": "HIGHLIGHT_ON_FACULTY_CONSOLE",
+
   "escalation": {
     "level": "EMERGENCY",
     "next_team": "AI_ENGINEERING_TEAM",
     "requires_tl_acknowledgement": true
   }
 }
+## AI Engineering Trigger Response(README)
+
+The AI Engineering module receives critical alerts from the Disaster Management Team and processes them using NLP-based risk analysis.
+
+### Trigger Workflow
+
+Disaster Management Team
+        ↓
+Risk Detection
+        ↓
+AI Engineering Trigger
+        ↓
+NLP Processing
+        ↓
+Intent & Entity Extraction
+        ↓
+Risk Classification
+        ↓
+Recommended Action
+        ↓
+Chatbot / TL / Academic Advisor
+
+### Example Scenario
+
+A student currently has 76.2% attendance. Based on the attendance trajectory, the projected semester attendance is 67.8%, which is below the minimum statutory requirement of 75%.
+
+The system identifies this as:
+
+- **Anomaly:** Projected Exam Debarment
+- **Risk Level:** Critical
+- **Confidence:** 92.4%
+- **Intervention Window:** 4 days
+- **Required Action:** Immediate academic intervention
+
+### AI Engineering Responsibilities
+
+1. Validate the risk prediction.
+2. Analyze the attendance trajectory.
+3. Identify the intervention window.
+4. Classify the severity of the incident.
+5. Generate preventive actions.
+6. Trigger the chatbot escalation workflow.
+7. Notify the academic advisor.
+8. Provide the TL with recommended actions.
+
+### NLP Pipeline
+
+The NLP model processes incoming alerts and extracts important information such as:
+
+- Student-related entities
+- Subject names
+- Attendance percentages
+- Absence patterns
+- Risk level
+- Anomaly type
+- Required actions
+
+The extracted information is converted into a structured JSON response that can be consumed by the chatbot and faculty portal.
