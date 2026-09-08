@@ -1,10 +1,3 @@
-Yes — that changes the architecture slightly because your team is acting as a **middle layer** between the **Academic Team** and the **Object Detection/Anomaly Detection Team**.
-
- The flow should be:
-
- **Academic Team → Student Information → Face Recognition Team → Student Identification + 4 Details → Object Detection Team → Anomaly Detection → Student Management Portal**
-
- Here is the revised proposal with that integration clearly included.
 
  Project Proposal – CNN-Based Face Recognition and Automated Student Attendance
 
