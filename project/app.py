@@ -106,7 +106,6 @@ USERS = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # NAVIGATION MAPS
-# Labels must match the exact if/elif strings used inside each module.
 # ─────────────────────────────────────────────────────────────────────────────
 MANAGEMENT_PAGES = [
     "🏠  Dashboard",
@@ -145,8 +144,6 @@ def _init_state():
         "username":  None,
         "user_info": {},
         "app_page":  None,
-        "prefill_user": "",
-        "prefill_pass": "",
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -161,32 +158,32 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #0f172a;
+html, body, [class*="css"], .stApp {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
 }
 
 /* ── Light Sidebar ────────────────────────────────── */
 [data-testid="stSidebar"] {
-    background: #ffffff !important;
+    background-color: #ffffff !important;
     border-right: 1px solid #e2e8f0 !important;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.02) !important;
 }
 [data-testid="stSidebar"] * {
     color: #334155 !important;
 }
 [data-testid="stSidebar"] .stRadio label {
     color: #475569 !important;
-    font-size: 0.88rem;
-    font-weight: 500;
-    padding: 9px 12px;
-    border-radius: 9px;
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    margin-bottom: 2px;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    padding: 8px 12px !important;
+    border-radius: 9px !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 2px !important;
 }
 [data-testid="stSidebar"] .stRadio label:hover {
     background: #f1f5f9 !important;
@@ -196,35 +193,77 @@ html, body, [class*="css"] {
 [data-testid="stSidebar"] .stRadio label[data-baseweb="radio"]:has(input:checked) {
     background: #eff6ff !important;
     color: #1d4ed8 !important;
-    font-weight: 600 !important;
-    border-left: 3px solid #2563eb;
+    font-weight: 700 !important;
+    border-left: 3px solid #2563eb !important;
 }
-div[data-testid="stRadio"] > div { gap: 3px; }
+
+/* ── Form Inputs (Ensure bright light theme inputs) ────────────────────────── */
+div[data-baseweb="input"] {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+}
+div[data-baseweb="input"]:focus-within {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+div[data-baseweb="input"] input {
+    background-color: transparent !important;
+    color: #0f172a !important;
+    font-size: 0.95rem !important;
+}
+div[data-baseweb="input"] input::placeholder {
+    color: #94a3b8 !important;
+}
+div[data-baseweb="textarea"] {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+}
+div[data-baseweb="textarea"] textarea {
+    background-color: transparent !important;
+    color: #0f172a !important;
+}
+div[data-testid="stTextInput"] label,
+div[data-testid="stTextInput"] label p,
+div[data-testid="stTextArea"] label,
+div[data-testid="stTextArea"] label p,
+div[data-testid="stSelectbox"] label,
+div[data-testid="stSelectbox"] label p {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+}
+
+/* ── Radio Buttons text contrast ─────────────────── */
+div[data-testid="stRadio"] label p,
+div[data-testid="stRadio"] span {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+}
 
 /* ── Main Container ──────────────────────────────── */
-.stApp {
-    background: #f8fafc !important;
-}
 .main .block-container {
-    padding: 2rem 3rem 4rem !important;
-    max-width: 1400px;
+    padding: 2rem 2.5rem 4rem !important;
+    max-width: 1350px !important;
     background: transparent !important;
 }
 
 /* ── Typography ──────────────────────────────────── */
 .page-title {
-    font-family: 'Sora', sans-serif;
-    font-size: 1.85rem;
-    font-weight: 700;
-    color: #0f172a;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.25rem;
+    font-family: 'Sora', sans-serif !important;
+    font-size: 1.85rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.02em !important;
+    margin-bottom: 0.25rem !important;
 }
 .page-subtitle {
-    font-size: 0.92rem;
-    color: #64748b;
-    margin-bottom: 1.8rem;
-    line-height: 1.5;
+    font-size: 0.92rem !important;
+    color: #64748b !important;
+    margin-bottom: 1.8rem !important;
+    line-height: 1.5 !important;
 }
 
 /* ── Stat Cards ──────────────────────────────────── */
@@ -386,69 +425,40 @@ def _authenticate(role: str, username: str, password: str):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LOGIN PAGE  (Polished Light Theme UI/UX)
+# LOGIN PAGE
 # ─────────────────────────────────────────────────────────────────────────────
 def _render_login():
     st.markdown("""
     <style>
     section[data-testid="stSidebar"] { display: none !important; }
-    .stApp {
-        background: radial-gradient(circle at 10% 20%, #eff6ff 0%, #f8fafc 60%, #f1f5f9 100%) !important;
-    }
     .main .block-container {
         padding: 3rem 1.5rem !important;
-        max-width: 1000px !important;
+        max-width: 900px !important;
         margin: 0 auto !important;
-    }
-    .login-container-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 20px;
-        padding: 2.5rem 2.8rem;
-        box-shadow: 0 16px 36px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(0,0,0,0.02);
     }
     .brand-title {
         font-family: 'Sora', sans-serif;
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 800;
         color: #0f172a;
         letter-spacing: -0.03em;
         line-height: 1.1;
     }
     .brand-subtitle {
-        font-size: 0.88rem;
+        font-size: 0.92rem;
         color: #64748b;
         font-weight: 500;
         margin-top: 6px;
-    }
-    .role-badge-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        border-radius: 99px;
-        padding: 4px 14px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #334155;
-    }
-    .demo-box {
-        background: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 12px;
-        padding: 1rem 1.2rem;
-        margin-top: 1.5rem;
     }
     </style>
     """, unsafe_allow_html=True)
 
     # Centered Header
     st.markdown("""
-    <div style='text-align: center; margin-bottom: 2.2rem;'>
-        <div style='display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
-                    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 18px; font-size: 2.2rem; margin-bottom: 0.8rem;
-                    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);'>
+    <div style='text-align: center; margin-bottom: 2rem;'>
+        <div style='display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px;
+                    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 20px; font-size: 2.4rem; margin-bottom: 0.8rem;
+                    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);'>
             🏛️
         </div>
         <div class="brand-title">TechVerse ERP</div>
@@ -456,25 +466,21 @@ def _render_login():
     </div>
     """, unsafe_allow_html=True)
 
-    # 3-Column Layout for perfectly centered login card
-    col_l, col_center, col_r = st.columns([1, 2.2, 1])
+    col_l, col_center, col_r = st.columns([1, 2.4, 1])
 
     with col_center:
-        with st.container():
-            st.markdown('<div class="login-container-card">', unsafe_allow_html=True)
-
+        with st.container(border=True):
             st.markdown("""
-            <div style='text-align: center; margin-bottom: 1.3rem;'>
-                <div style='font-family: "Sora", sans-serif; font-size: 1.15rem; font-weight: 700; color: #0f172a;'>
+            <div style='text-align: center; margin-bottom: 1.2rem;'>
+                <div style='font-family: "Sora", sans-serif; font-size: 1.2rem; font-weight: 700; color: #0f172a;'>
                     Sign In to Portal
                 </div>
-                <div style='font-size: 0.82rem; color: #64748b; margin-top: 2px;'>
+                <div style='font-size: 0.84rem; color: #64748b; margin-top: 2px;'>
                     Select your portal role to continue
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            # Role Selection
             role = st.radio(
                 "Select Role",
                 ["management", "staff", "student"],
@@ -488,9 +494,6 @@ def _render_login():
                 label_visibility="collapsed",
             )
 
-            st.markdown("<div style='height: 0.6rem'></div>", unsafe_allow_html=True)
-
-            # Default / Selected Credentials
             demo_defaults = {
                 "management": ("admin.jose", "Faculty#103"),
                 "staff":      ("prof.rao", "Faculty#101"),
@@ -498,22 +501,21 @@ def _render_login():
             }
             def_user, def_pass = demo_defaults[role]
 
-            # Form inputs
             username = st.text_input(
                 "Username",
-                value=st.session_state.get("prefill_user", def_user),
+                value=def_user,
                 placeholder="Enter your username",
                 key="login_uname",
             )
             password = st.text_input(
                 "Password",
-                value=st.session_state.get("prefill_pass", def_pass),
+                value=def_pass,
                 placeholder="Enter your password",
                 type="password",
                 key="login_pwd",
             )
 
-            st.markdown("<div style='height: 0.4rem'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 0.3rem'></div>", unsafe_allow_html=True)
 
             if st.button("Sign In  →", use_container_width=True, type="primary", key="login_btn"):
                 info = _authenticate(role, username.strip(), password)
@@ -531,24 +533,20 @@ def _render_login():
                 else:
                     st.error("❌ Invalid credentials. Please verify your username and password.")
 
-            # Quick credentials guide
             st.markdown(f"""
-            <div class="demo-box">
-                <div style='font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; margin-bottom: 4px;'>
-                    Demo Account for Selected Role
+            <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 10px; padding: 0.8rem 1rem; margin-top: 1.2rem; text-align: center;">
+                <div style='font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px;'>
+                    Demo Credentials (Auto-filled)
                 </div>
-                <div style='display: flex; justify-content: space-around; font-size: 0.82rem; color: #1e293b; font-family: monospace; font-weight: 600;'>
-                    <span>User: <strong style='color:#2563eb;'>{def_user}</strong></span>
-                    <span>Pass: <strong style='color:#2563eb;'>{def_pass}</strong></span>
+                <div style='font-size: 0.84rem; color: #1e293b; font-family: monospace;'>
+                    Username: <strong style='color:#2563eb;'>{def_user}</strong> &nbsp;|&nbsp; Password: <strong style='color:#2563eb;'>{def_pass}</strong>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-            st.markdown('</div>', unsafe_allow_html=True)
-
     st.markdown("""
-    <div style='text-align: center; font-size: 0.74rem; color: #94a3b8; margin-top: 2.5rem;'>
-        © 2026 TechVerse Engineering College &nbsp;·&nbsp; AI-Powered Smart Campus Platform &nbsp;·&nbsp; Secure SSL
+    <div style='text-align: center; font-size: 0.76rem; color: #94a3b8; margin-top: 2.2rem;'>
+        © 2026 TechVerse Engineering College &nbsp;·&nbsp; AI-Powered Smart Campus Platform
     </div>
     """, unsafe_allow_html=True)
 
