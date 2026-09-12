@@ -1,29 +1,36 @@
 import streamlit as st
 import requests
 import os
+from datetime import datetime
 
-# ---------------------------------------------------------
-# MODULE-LEVEL CONFIG
-# ---------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# MODULE CONFIG & MODEL MAPPINGS
+# ─────────────────────────────────────────────────────────────────────────────
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 DEFAULT_MODEL = "google/gemini-2.5-flash"
 
 AVAILABLE_MODELS = {
-    "Gemini 2.5 Flash": "google/gemini-2.5-flash",
-    "Claude 3.5 Sonnet": "anthropic/claude-3.5-sonnet",
-    "GPT-4o Mini":       "openai/gpt-4o-mini",
-    "DeepSeek R1":       "deepseek/deepseek-r1",
+    "Gemini 2.5 Flash":    "google/gemini-2.5-flash",
+    "GPT-4o Mini":          "openai/gpt-4o-mini",
+    "DeepSeek Chat (V3)":   "deepseek/deepseek-chat",
+    "Llama 3.3 70B":        "meta-llama/llama-3.3-70b-instruct",
+    "Claude 3 Haiku":       "anthropic/claude-3-haiku",
 }
 
-try:
-    API_KEY = st.secrets["OPENROUTER_API_KEY"]
-except Exception:
+def _get_api_key():
+    """Retrieve API key from streamlit secrets, os environ, or local config."""
     try:
-        API_KEY = os.environ["OPENROUTER_API_KEY"]
-    except KeyError:
-        API_KEY = None
+        if "OPENROUTER_API_KEY" in st.secrets:
+            return st.secrets["OPENROUTER_API_KEY"]
+    except Exception:
+        pass
+    return os.environ.get("OPENROUTER_API_KEY", None)
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SMART CAMPUS KNOWLEDGE FALLBACK
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _generate_academic_response(prompt_text: str) -> str:
     """Intelligent fallback for campus, CSE, and academic inquiries."""
@@ -32,7 +39,7 @@ def _generate_academic_response(prompt_text: str) -> str:
     if "dijkstra" in p or "shortest path" in p:
         return """### 🛣️ Dijkstra's Shortest Path Algorithm
 
-**Dijkstra's Algorithm** is a greedy algorithm that finds the shortest path from a single source vertex to all other vertices in a weighted graph with **non-negative edge weights**.
+**Dijkstra's Algorithm** is a greedy algorithm that computes the shortest path from a single source vertex to all other vertices in a weighted graph with **non-negative edge weights**.
 
 #### ⚡ Time & Space Complexity
 | Metric | Adjacency Matrix | Min-Heap / Priority Queue |
@@ -63,8 +70,7 @@ def dijkstra(graph, start):
                 
     return distances
 ```
-> [!NOTE]
-> For graphs with negative edge weights, use the **Bellman-Ford algorithm** ($O(V \\cdot E)$) instead.
+> **Note:** For graphs containing negative edge weights, use the **Bellman-Ford algorithm** ($O(V \\cdot E)$) instead.
 """
 
     elif "paging" in p or "virtual memory" in p:
@@ -77,7 +83,7 @@ def dijkstra(graph, start):
 2. **Frames**: Fixed-size blocks in **Physical Address Space** (Main memory / RAM).
    - *Size of a Page == Size of a Frame* (typically 4 KB).
 3. **Page Table**: Maintains the mapping between virtual page numbers (VPN) and physical frame numbers (PFN).
-4. **TLB (Translation Lookaside Buffer)**: A fast hardware cache storing recent page table translations to speed up memory access.
+4. **TLB (Translation Lookaside Buffer)**: A fast hardware associative cache storing recent page table translations.
 
 ```
 Virtual Address [ Page Number (p) | Offset (d) ]
@@ -86,12 +92,12 @@ Virtual Address [ Page Number (p) | Offset (d) ]
 Physical Address [ Frame Number (f) | Offset (d) ]
 ```
 
-#### 🔄 Page Fault Handling
+#### 🔄 Page Fault Sequence
 When a requested page is not in RAM:
-1. Hardware generates a **Page Fault Trap** to the OS kernel.
-2. OS brings the missing page from disk swap space into an empty physical frame.
+1. Hardware issues a **Page Fault Trap** to the OS.
+2. OS kernel fetches the missing page from swap space into a free frame.
 3. Page table is updated (Valid-Invalid bit set to `1`).
-4. The faulting instruction is restarted seamlessly.
+4. The faulting CPU instruction is restarted.
 """
 
     elif "attendance" in p or "condonation" in p or "draft" in p or "email" in p:
@@ -127,16 +133,15 @@ TechVerse Engineering College
 
 Both **B-Tree** and **B+ Tree** are self-balancing multi-way search trees heavily used in database indexing and file systems.
 
-| Feature | B-Tree | B+ Tree (Preferred in DBMS) |
+| Feature | B-Tree | B+ Tree (Standard in DBMS) |
 |---|---|---|
 | **Data Pointer Location** | Stored in both internal and leaf nodes | Stored **only in leaf nodes** |
-| **Search Performance** | Varies; search can end at an internal node | Uniform; always reaches leaf nodes ($O(\\log_B N)$) |
-| **Leaf Node Chaining** | Leaf nodes are isolated | Leaf nodes are connected via a **linked list** |
-| **Range Queries** | Slower; requires full tree tree traversal | **Ultra-fast**; traverses leaf linked list linearly |
-| **Node Capacity** | Fewer keys per node (stores data pointers) | More keys per node $\\rightarrow$ **shorter tree height** |
+| **Search Performance** | Variable; search can end at an internal node | Uniform; always reaches leaf nodes ($O(\\log_B N)$) |
+| **Leaf Node Chaining** | Leaf nodes are isolated | Leaf nodes are connected via a **doubly linked list** |
+| **Range Queries** | Slower; requires full tree traversal | **Ultra-fast**; traverses leaf linked list linearly |
+| **Node Key Capacity** | Lower (stores record pointers in internal nodes) | Higher $\\rightarrow$ **shorter tree height & fewer I/Os** |
 
-> [!TIP]
-> In relational databases like PostgreSQL and MySQL InnoDB, **B+ Trees** are universally favored because leaf-level linked lists allow instant range scans (`WHERE age BETWEEN 20 AND 30`).
+> In databases like PostgreSQL and MySQL InnoDB, **B+ Trees** are universally favored because leaf linked lists enable rapid range scans (`WHERE score BETWEEN 80 AND 100`).
 """
 
     else:
@@ -145,27 +150,26 @@ Both **B-Tree** and **B+ Tree** are self-balancing multi-way search trees heavil
 Thank you for querying the **TechVerse Campus AI Assistant**.
 
 Regarding **"{prompt_text.strip()}"**:
-- **Curriculum & Coursework:** You can check the course syllabus, lecture notes, and faculty office hours under the **Courses** and **Sections** modules.
-- **Academic Standing:** Maintain an overall attendance above **75%** to ensure eligibility for end-semester assessments.
-- **Examinations:** Continuous internal evaluations (Series I & II) contribute 40% towards the total subject grade.
-
-*Tip: Connect your `OPENROUTER_API_KEY` in `.streamlit/secrets.toml` to query live LLMs (Gemini 2.5, Claude 3.5, GPT-4o, DeepSeek R1) in real-time.*
+- **Curriculum & Syllabi:** Course structures, lecture credits, and faculty allocations are available under the **Courses** and **Sections** modules.
+- **Academic Standing:** Maintain an overall attendance above **75%** to ensure eligibility for end-semester university examinations.
+- **Continuous Evaluation:** Internal tests (Series I & II) and laboratory assessments contribute to internal scoring.
 """
 
 
-# ---------------------------------------------------------
-# OPENROUTER FUNCTION
-# ---------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# OPENROUTER INVOCATION
+# ─────────────────────────────────────────────────────────────────────────────
 
 def ask_openrouter(messages, model):
-    """Send conversation history to OpenRouter or return smart academic response."""
+    """Send conversation history to OpenRouter or return smart fallback."""
+    api_key = _get_api_key()
     last_user_msg = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
 
-    if not API_KEY or "your-actual-key-here" in API_KEY:
+    if not api_key or "your-actual-key-here" in api_key:
         return _generate_academic_response(last_user_msg)
 
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type":  "application/json",
         "HTTP-Referer":  "http://localhost:8501",
         "X-Title":       "TechVerse Campus AI Assistant",
@@ -175,7 +179,7 @@ def ask_openrouter(messages, model):
         "model":       model,
         "messages":    messages,
         "temperature": 0.7,
-        "max_tokens":  2000,
+        "max_tokens":  1000,
     }
 
     try:
@@ -183,127 +187,144 @@ def ask_openrouter(messages, model):
             OPENROUTER_URL,
             headers=headers,
             json=payload,
-            timeout=30,
+            timeout=40,
         )
 
-        if response.status_code != 200:
+        if response.status_code == 200:
+            res_json = response.json()
+            return res_json["choices"][0]["message"]["content"]
+        else:
             return _generate_academic_response(last_user_msg)
-
-        return response.json()["choices"][0]["message"]["content"]
 
     except Exception:
         return _generate_academic_response(last_user_msg)
 
 
-
-# ---------------------------------------------------------
-# RENDER — called from app.py
-# ---------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# RENDER FUNCTION (CALLED FROM app.py)
+# ─────────────────────────────────────────────────────────────────────────────
 
 def render():
-    """Render the AI chatbot page inside the connected TechVerse app."""
+    """Render the state-of-the-art AI Assistant portal."""
 
-    st.markdown("""
-    <style>
-    .chat-header-box {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 1.5rem 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    .suggestion-chip {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 99px;
-        padding: 6px 14px;
-        font-size: 0.8rem;
-        color: #334155;
-        font-weight: 500;
-        display: inline-block;
-        margin-right: 6px;
-        margin-bottom: 6px;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    # ── Session state ─────────────────────────────────────────────────────────
+    # ── Session State Initialisation ──────────────────────────────────────────
     if "chatbot_messages" not in st.session_state:
         st.session_state.chatbot_messages = []
     if "chatbot_model" not in st.session_state:
         st.session_state.chatbot_model = DEFAULT_MODEL
 
-    # ── Header bar ────────────────────────────────────────────────────────────
-    st.markdown('<div class="page-title">Campus AI Assistant</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Interactive AI academic companion for course queries, code explanations, syllabus assistance, and campus guidance</div>', unsafe_allow_html=True)
+    api_key = _get_api_key()
+    is_live = bool(api_key and "your-actual-key-here" not in api_key)
 
-    # Toolbar
+    # ── Header & Control Toolbar ──────────────────────────────────────────────
+    st.markdown("""
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div class="page-title" style="display: flex; align-items: center; gap: 10px;">
+                <span>Campus AI Assistant</span>
+                <span class="badge badge-blue" style="font-size: 0.72rem; vertical-align: middle;">v3.1 Pro</span>
+            </div>
+            <div class="page-subtitle" style="margin-bottom: 0;">
+                Academic companion for course queries, code debugging, syllabus guidance, and exam preparation
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Modern Control Bar ────────────────────────────────────────────────────
     with st.container(border=True):
-        t_left, _, t_right = st.columns([3, 1, 2])
-        with t_left:
-            st.markdown(f"🤖 **Model Engine:** `{st.session_state.chatbot_model}`")
-        with t_right:
-            sel_name = st.selectbox(
-                "Change Model",
+        col_info, col_model, col_clear = st.columns([3.2, 2.2, 1.2])
+
+        with col_info:
+            if is_live:
+                st.markdown("""
+                <div style="display: flex; align-items: center; gap: 8px; padding-top: 6px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 8px rgba(22, 163, 74, 0.6);"></span>
+                    <span style="font-size: 0.86rem; font-weight: 700; color: #15803d;">Live OpenRouter AI Connected</span>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown("""
+                <div style="display: flex; align-items: center; gap: 8px; padding-top: 6px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #d97706;"></span>
+                    <span style="font-size: 0.86rem; font-weight: 700; color: #b45309;">Campus Knowledge Engine Active</span>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with col_model:
+            selected_model_name = st.selectbox(
+                "Select Model",
                 list(AVAILABLE_MODELS.keys()),
                 index=list(AVAILABLE_MODELS.values()).index(st.session_state.chatbot_model)
                 if st.session_state.chatbot_model in AVAILABLE_MODELS.values() else 0,
-                key="chatbot_model_sel",
+                key="chatbot_model_picker",
                 label_visibility="collapsed",
             )
-            if AVAILABLE_MODELS[sel_name] != st.session_state.chatbot_model:
-                st.session_state.chatbot_model = AVAILABLE_MODELS[sel_name]
+            target_model = AVAILABLE_MODELS[selected_model_name]
+            if target_model != st.session_state.chatbot_model:
+                st.session_state.chatbot_model = target_model
                 st.rerun()
 
-    # ── Welcome & Suggested Queries ───────────────────────────────────────────
+        with col_clear:
+            if st.button("🗑️ Clear", use_container_width=True, key="chatbot_clear_btn", help="Clear conversation history"):
+                st.session_state.chatbot_messages = []
+                st.rerun()
+
+    # ── Welcome & Interactive Suggestion Cards (When Chat is Empty) ───────────
     if not st.session_state.chatbot_messages:
-        with st.container(border=True):
-            st.markdown("""
-            <div style='text-align: center; padding: 1.5rem 1rem;'>
-                <div style='font-size: 2.8rem; margin-bottom: 0.5rem;'>✨</div>
-                <div style='font-family: "Sora", sans-serif; font-size: 1.3rem; font-weight: 700; color: #0f172a;'>
-                    How can I assist you today?
-                </div>
-                <div style='font-size: 0.88rem; color: #64748b; margin-top: 4px; max-width: 600px; margin-left: auto; margin-right: auto;'>
-                    Ask questions about your courses, debug algorithms, get study plans, or draft emails to advisors.
-                </div>
+        st.markdown("""
+        <div style='text-align: center; padding: 2rem 1rem 1.5rem;'>
+            <div style='display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px;
+                        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                        border: 1px solid #bfdbfe; border-radius: 20px; font-size: 2.2rem; margin-bottom: 0.8rem;
+                        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);'>
+                ✨
             </div>
-            """, unsafe_allow_html=True)
+            <div style='font-family: "Sora", sans-serif; font-size: 1.4rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;'>
+                How can I assist you today?
+            </div>
+            <div style='font-size: 0.9rem; color: #64748b; margin-top: 4px; max-width: 580px; margin-left: auto; margin-right: auto;'>
+                Ask anything about courses, debug algorithms, study plans, or draft emails.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-            st.markdown("<div style='font-size:0.75rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px;'>Try asking:</div>", unsafe_allow_html=True)
-            suggestions = [
-                "Explain Dijkstra's shortest path algorithm with time complexity.",
-                "How does virtual memory paging work in Operating Systems?",
-                "Draft a formal request email for attendance condonation.",
-                "What is the difference between B-Tree and B+ Tree in DBMS?",
-            ]
-            s_cols = st.columns(2)
-            for i, sug in enumerate(suggestions):
-                col = s_cols[i % 2]
-                if col.button(f"💬 {sug}", key=f"sug_{i}", use_container_width=True):
-                    st.session_state.chatbot_messages.append({"role": "user", "content": sug})
-                    st.rerun()
+        st.markdown("<div style='font-size: 0.74rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8rem;'>Recommended Topics</div>", unsafe_allow_html=True)
 
-    # ── Chat history ──────────────────────────────────────────────────────────
+        cards = [
+            ("🛣️ Algorithms", "Explain Dijkstra's shortest path algorithm with time complexity & Python code.", 0),
+            ("💾 Operating Systems", "How does virtual memory paging and TLB cache translation work?", 1),
+            ("✉️ Academic Email", "Draft a formal email to HOD requesting attendance condonation.", 2),
+            ("🌳 Database Indexing", "What is the difference between B-Tree and B+ Tree in DBMS?", 3),
+        ]
+
+        c1, c2 = st.columns(2, gap="medium")
+        for title, prompt_text, idx in cards:
+            col = c1 if idx % 2 == 0 else c2
+            with col:
+                with st.container(border=True):
+                    st.markdown(f"<div style='font-weight: 700; color: #0f172a; font-size: 0.95rem; margin-bottom: 4px;'>{title}</div>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='color: #64748b; font-size: 0.82rem; margin-bottom: 10px; line-height: 1.4;'>{prompt_text}</div>", unsafe_allow_html=True)
+                    if st.button("Ask this  →", key=f"rec_card_{idx}", use_container_width=True):
+                        st.session_state.chatbot_messages.append({"role": "user", "content": prompt_text})
+                        st.rerun()
+
+    # ── Chat Messages Stream ──────────────────────────────────────────────────
     for msg in st.session_state.chatbot_messages:
-        role, content = msg["role"], msg["content"]
-        with st.chat_message(role, avatar="🧑‍🎓" if role == "user" else "🤖"):
+        role = msg["role"]
+        content = msg["content"]
+        avatar = "🧑‍🎓" if role == "user" else "🤖"
+        with st.chat_message(role, avatar=avatar):
             st.markdown(content)
 
-    # ── Chat Input ────────────────────────────────----------------------------
-    prompt = st.chat_input("Ask anything about your courses, timetable or campus...")
+    # ── Chat Input ────────────────────────────────────────────────────────────
+    user_query = st.chat_input("Ask anything about your courses, timetable, code or campus...")
 
-    if prompt:
-        st.session_state.chatbot_messages.append({"role": "user", "content": prompt})
+    if user_query:
+        st.session_state.chatbot_messages.append({"role": "user", "content": user_query})
 
         with st.chat_message("user", avatar="🧑‍🎓"):
-            st.markdown(prompt)
+            st.markdown(user_query)
 
         api_messages = [
             {
@@ -317,16 +338,9 @@ def render():
         ] + st.session_state.chatbot_messages
 
         with st.chat_message("assistant", avatar="🤖"):
-            with st.spinner("Analyzing request..."):
-                answer = ask_openrouter(api_messages, st.session_state.chatbot_model)
-            st.markdown(answer)
+            with st.spinner("🧠 Analyzing request and synthesizing response..."):
+                reply = ask_openrouter(api_messages, st.session_state.chatbot_model)
+            st.markdown(reply)
 
-        st.session_state.chatbot_messages.append({"role": "assistant", "content": answer})
+        st.session_state.chatbot_messages.append({"role": "assistant", "content": reply})
         st.rerun()
-
-    # Clear chat button
-    if st.session_state.chatbot_messages:
-        st.markdown("<div style='height: 0.8rem'></div>", unsafe_allow_html=True)
-        if st.button("🗑️  Clear Conversation History", key="chatbot_clear", type="secondary"):
-            st.session_state.chatbot_messages = []
-            st.rerun()

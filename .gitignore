@@ -79,10 +79,11 @@ dist/
 .env.test.local
 .env.production.local
 *.pem
-*.key
 .streamlit/secrets.toml
+**/.streamlit/secrets.toml
+secrets.toml
+*.toml.local
 
-# IDEs and Editors
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

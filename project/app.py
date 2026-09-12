@@ -331,16 +331,29 @@ div.stButton > button[kind="primary"]:hover {
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38) !important;
 }
 
-/* ── Chatbot Components ──────────────────────────── */
+/* ── Chatbot Components & Floating Input Container ─ */
+[data-testid="stBottom"],
+[data-testid="stBottom"] > div,
+.stChatFloatingInputContainer,
+div[data-testid="stChatInputContainer"] {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 0.6rem !important;
+    padding-bottom: 1.2rem !important;
+}
+[data-testid="stBottom"] > div > div {
+    background-color: transparent !important;
+}
 div[data-testid="stChatInput"] {
     background-color: #ffffff !important;
     border: 1.5px solid #cbd5e1 !important;
     border-radius: 14px !important;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06) !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
 }
 div[data-testid="stChatInput"]:focus-within {
     border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
 }
 div[data-testid="stChatInput"] textarea {
     background-color: transparent !important;
@@ -348,17 +361,25 @@ div[data-testid="stChatInput"] textarea {
     -webkit-text-fill-color: #0f172a !important;
     font-size: 0.95rem !important;
 }
+div[data-testid="stChatInput"] button {
+    color: #2563eb !important;
+}
 div[data-testid="stChatMessage"] {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 14px !important;
     box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03) !important;
     color: #0f172a !important;
-    margin-bottom: 0.75rem !important;
+    margin-bottom: 0.85rem !important;
+    padding: 1rem 1.25rem !important;
 }
 div[data-testid="stChatMessage"] p,
 div[data-testid="stChatMessage"] div {
     color: #0f172a !important;
+}
+div[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background-color: #eff6ff !important;
+    border-color: #bfdbfe !important;
 }
 
 /* ── Dialogs & Modals ────────────────────────────── */
