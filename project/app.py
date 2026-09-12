@@ -53,6 +53,13 @@ STUDENT_PAGES = [
     "🤖 AI Assistant",
 ]
 
+AI_ENGG_PAGES = [
+    "👁️  Live Surveillance & Detection",
+    "📊  AI Model Metrics & Benchmarks",
+    "🚨  Security & Violation Logs",
+    "🤖  AI Assistant",
+]
+
 # ─────────────────────────────────────────────────────────────────────────────
 # SESSION STATE BOOTSTRAP
 # ─────────────────────────────────────────────────────────────────────────────
@@ -593,11 +600,12 @@ def _render_login():
 
             role = st.radio(
                 "Select Role",
-                ["management", "staff", "student"],
+                ["management", "staff", "student", "ai_engg"],
                 format_func=lambda x: {
                     "management": "🛡️  Management",
                     "staff":      "🎓  Faculty & Staff",
                     "student":    "🧑‍🎓  Student Portal",
+                    "ai_engg":    "🔬  AI Engineer Lab",
                 }[x],
                 horizontal=True,
                 key="login_role_sel",
@@ -608,6 +616,7 @@ def _render_login():
                 "management": ("admin.jose", "Faculty#103"),
                 "staff":      ("prof.rao", "Faculty#101"),
                 "student":    ("stu.arjun21", "Student#201"),
+                "ai_engg":    ("engg.alex", "Faculty#103"),
             }
             def_user, def_pass = demo_defaults[role]
 
@@ -638,6 +647,7 @@ def _render_login():
                         "management": MANAGEMENT_PAGES[0],
                         "staff":      STAFF_PAGES[0],
                         "student":    STUDENT_PAGES[0],
+                        "ai_engg":    AI_ENGG_PAGES[0],
                     }[role]
                     st.rerun()
                 else:
@@ -671,16 +681,19 @@ def _render_sidebar():
         "management": MANAGEMENT_PAGES,
         "staff":      STAFF_PAGES,
         "student":    STUDENT_PAGES,
+        "ai_engg":    AI_ENGG_PAGES,
     }[role]
     role_color_badge = {
         "management": "badge-purple",
         "staff":      "badge-blue",
         "student":    "badge-green",
+        "ai_engg":    "badge-cyan",
     }[role]
     role_label = {
         "management": "Management",
         "staff":      "Faculty / Staff",
         "student":    "Student",
+        "ai_engg":    "AI Engineer",
     }[role]
 
     with st.sidebar:
@@ -869,6 +882,7 @@ def _render_main():
     import stud       as _stud
     import management as _mgmt
     import form       as _form
+    import ai_engg    as _ai_engg
 
     role = st.session_state.role
     page = st.session_state.app_page
@@ -891,6 +905,12 @@ def _render_main():
         else:
             _stud.render(page)
 
+    elif role == "ai_engg":
+        if page == AI_ENGG_PAGES[-1]:     # "🤖  AI Assistant"
+            _chatbot.render()
+        else:
+            _ai_engg.render(page)
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ENTRY POINT
@@ -900,3 +920,4 @@ if not st.session_state.logged_in:
 else:
     _render_sidebar()
     _render_main()
+

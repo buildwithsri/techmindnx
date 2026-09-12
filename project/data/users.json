@@ -79,5 +79,23 @@
       "sem": "6",
       "initials": "EJ"
     }
+  },
+  "ai_engg": {
+    "engg.alex": {
+      "password": "Faculty#103",
+      "display_name": "Alex Chen, M.Tech",
+      "title": "Lead Computer Vision & AI Engineer",
+      "dept": "AI & Robotics Lab",
+      "email": "alex.ai@tve.edu",
+      "initials": "AC"
+    },
+    "ai.dev": {
+      "password": "ai123",
+      "display_name": "AI Vision Specialist",
+      "title": "Edge AI & CCTV Vision Ops",
+      "dept": "AI & Surveillance Lab",
+      "email": "aidev@tve.edu",
+      "initials": "AI"
+    }
   }
 }
