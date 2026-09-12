@@ -1,320 +1,401 @@
-
+import streamlit as st
+import pandas as pd
 import random
 import string
 
-import streamlit as st
+# ─── Seed Data (module-level) ────────────────────────────────────────────────
 
-st.set_page_config(page_title="Management Portal", page_icon="🎓", layout="wide")
+SEED_STAFF = [
+    {"id": "TVE-STF-001", "name": "Dr. Arjun Nair",   "username": "prof.rao",  "role": "Faculty",    "dept": "CSE", "email": "arjun@tve.edu",   "phone": "+91 94460 12345", "status": "Active",   "password": "Faculty#101"},
+    {"id": "TVE-STF-002", "name": "Dr. Meera Pillai",  "username": "dr.menon",  "role": "Faculty",    "dept": "ECE", "email": "meera@tve.edu",   "phone": "+91 94460 67890", "status": "Active",   "password": "Faculty#102"},
+    {"id": "TVE-STF-003", "name": "Admin Jose",        "username": "admin.jose","role": "Admin",      "dept": "Admin","email": "jose@tve.edu",   "phone": "+91 98001 11223", "status": "Active",   "password": "Faculty#103"},
+    {"id": "TVE-STF-004", "name": "Lib. Anu",          "username": "lib.anu",   "role": "Librarian",  "dept": "LIB", "email": "anu@tve.edu",     "phone": "+91 96330 55678", "status": "On Leave", "password": "Faculty#104"},
+]
 
-# ---------------------------------------------------------------------------
-# Dummy "database" (prototype only)
-# ---------------------------------------------------------------------------
+SEED_STUDENTS = [
+    {"id": "TVE-STU-001", "name": "Aditya Sharma",  "username": "stu.arjun21", "dept": "CSE", "sem": "S6", "email": "aditya@tve.edu",  "phone": "+91 98765 43210", "status": "Active",    "password": "Student#201"},
+    {"id": "TVE-STU-002", "name": "Bhavana Nair",   "username": "stu.divya22", "dept": "CSE", "sem": "S6", "email": "bhavana@tve.edu", "phone": "+91 98765 43211", "status": "Active",    "password": "Student#202"},
+    {"id": "TVE-STU-003", "name": "Chetan Pillai",  "username": "stu.farhan23","dept": "CSE", "sem": "S6", "email": "chetan@tve.edu",  "phone": "+91 98765 43212", "status": "Active",    "password": "Student#203"},
+    {"id": "TVE-STU-004", "name": "Deepthi Menon",  "username": "stu.leah24",  "dept": "CSE", "sem": "S6", "email": "deepthi@tve.edu", "phone": "+91 98765 43213", "status": "Suspended", "password": "Student#204"},
+    {"id": "TVE-STU-005", "name": "Edwin Jose",     "username": "stu.nihal25", "dept": "CSE", "sem": "S6", "email": "edwin@tve.edu",   "phone": "+91 98765 43214", "status": "Active",    "password": "Student#205"},
+]
 
-COLLECTIONS = {"staff": "Staff", "students": "Students"}
-
-
-def seed_staff():
-    return [
-        {"id": 1, "login": "prof.rao", "password": "Faculty#101"},
-        {"id": 2, "login": "dr.menon", "password": "Faculty#102"},
-        {"id": 3, "login": "admin.jose", "password": "Faculty#103"},
-        {"id": 4, "login": "lib.anu", "password": "Faculty#104"},
-    ]
-
-
-def seed_students():
-    return [
-        {"id": 1, "login": "stu.arjun21", "password": "Student#201"},
-        {"id": 2, "login": "stu.divya22", "password": "Student#202"},
-        {"id": 3, "login": "stu.farhan23", "password": "Student#203"},
-        {"id": 4, "login": "stu.leah24", "password": "Student#204"},
-        {"id": 5, "login": "stu.nihal25", "password": "Student#205"},
-    ]
+DEPARTMENTS = ["CSE", "ECE", "ME", "CE", "EEE", "Admin", "LIB"]
+ROLES       = ["Faculty", "HOD", "Admin", "Librarian", "Lab Staff"]
 
 
-def init_state():
-    if "staff" not in st.session_state:
-        st.session_state.staff = seed_staff()
-    if "students" not in st.session_state:
-        st.session_state.students = seed_students()
-    if "next_id" not in st.session_state:
-        st.session_state.next_id = {"staff": 5, "students": 6}
-    if "page" not in st.session_state:
-        st.session_state.page = "dashboard"
-    if "reset_result" not in st.session_state:
-        st.session_state.reset_result = None
+# ─── Helpers ─────────────────────────────────────────────────────────────────
+
+def _init_mgmt_state():
+    if "mgmt_staff" not in st.session_state:
+        st.session_state.mgmt_staff    = list(SEED_STAFF)
+    if "mgmt_students" not in st.session_state:
+        st.session_state.mgmt_students = list(SEED_STUDENTS)
+    if "mgmt_next_id" not in st.session_state:
+        st.session_state.mgmt_next_id  = 5
+    if "mgmt_page" not in st.session_state:
+        st.session_state.mgmt_page     = "dashboard"
+    if "mgmt_reset_result" not in st.session_state:
+        st.session_state.mgmt_reset_result = None
 
 
-init_state()
+def _rand_password(length=10):
+    chars = string.ascii_letters + string.digits + "!@#"
+    return "".join(random.choices(chars, k=length))
 
 
-def hash_password_for_real_system(plaintext_password):
-    """Placeholder only — a real system would hash this, never store it as-is."""
-    return plaintext_password
-
-
-def generate_temp_password(length=10):
-    alphabet = string.ascii_letters + string.digits
-    return "".join(random.choice(alphabet) for _ in range(length))
-
-
-def find_account(collection, account_id):
-    for account in st.session_state[collection]:
-        if account["id"] == account_id:
-            return account
+def _find(collection, uid):
+    for item in st.session_state[collection]:
+        if item["id"] == uid:
+            return item
     return None
 
 
-def mask_password(pw):
-    return "•" * min(max(len(pw), 6), 10)
-
-
-def create_account(collection, login, password):
-    if any(a["login"].lower() == login.lower() for a in st.session_state[collection]):
-        return False, "That login already exists."
-    new_id = st.session_state.next_id[collection]
-    st.session_state.next_id[collection] += 1
-    st.session_state[collection].append(
-        {"id": new_id, "login": login, "password": hash_password_for_real_system(password)}
-    )
-    return True, "Account created."
-
-
-def update_account(collection, account_id, login, password):
-    duplicate = any(
-        a["login"].lower() == login.lower() and a["id"] != account_id
-        for a in st.session_state[collection]
-    )
-    if duplicate:
-        return False, "That login is already in use."
-    account = find_account(collection, account_id)
-    account["login"] = login
-    account["password"] = hash_password_for_real_system(password)
-    return True, "Account updated."
-
-
-def delete_account(collection, account_id):
+def _delete(collection, uid):
     st.session_state[collection] = [
-        a for a in st.session_state[collection] if a["id"] != account_id
+        x for x in st.session_state[collection] if x["id"] != uid
     ]
 
 
-def reset_password(collection, account_id):
-    account = find_account(collection, account_id)
-    temp = generate_temp_password()
-    account["password"] = hash_password_for_real_system(temp)
-    return temp
+# ─── Dialogs ─────────────────────────────────────────────────────────────────
 
-
-# ---------------------------------------------------------------------------
-# Dialogs (modals)
-# ---------------------------------------------------------------------------
-
-@st.dialog("Add Account")
-def add_dialog(collection):
-    label = COLLECTIONS[collection].rstrip("s")
-    st.caption(f"Create a new {label.lower()} account.")
-    login = st.text_input("Login ID / Username", key=f"add_login_{collection}")
-    password = st.text_input("Password", key=f"add_password_{collection}")
-
-    col_cancel, col_confirm = st.columns(2)
-    with col_cancel:
-        if st.button("Cancel", key=f"add_cancel_{collection}", use_container_width=True):
+@st.dialog("Add New Staff Account")
+def _add_staff_dialog():
+    c1, c2 = st.columns(2)
+    name     = c1.text_input("Full Name *", placeholder="Dr. Firstname Lastname")
+    username = c2.text_input("Username *", placeholder="e.g. prof.rao")
+    dept     = c1.selectbox("Department", DEPARTMENTS)
+    role     = c2.selectbox("Role", ROLES)
+    email    = c1.text_input("Email *", placeholder="staff@tve.edu")
+    phone    = c2.text_input("Phone", placeholder="+91 94460 00000")
+    pwd      = _rand_password()
+    st.info(f"🔑 **Generated Temporary Password:** `{pwd}`")
+    if st.button("Create Account", type="primary", use_container_width=True):
+        if not (name and username and email):
+            st.error("Name, username and email are required.")
+        elif any(x["username"] == username for x in st.session_state.mgmt_staff):
+            st.error("Username already exists in the system.")
+        else:
+            nid = f"TVE-STF-{st.session_state.mgmt_next_id:03d}"
+            st.session_state.mgmt_next_id += 1
+            st.session_state.mgmt_staff.append({
+                "id": nid, "name": name, "username": username,
+                "role": role, "dept": dept, "email": email,
+                "phone": phone, "status": "Active", "password": pwd,
+            })
             st.rerun()
-    with col_confirm:
-        if st.button("Create Account", key=f"add_confirm_{collection}", type="primary", use_container_width=True):
-            if not login.strip() or not password.strip():
-                st.error("Login and password are required.")
-            else:
-                ok, message = create_account(collection, login.strip(), password.strip())
-                if ok:
-                    st.toast(message, icon="✅")
-                    st.rerun()
-                else:
-                    st.error(message)
 
 
-@st.dialog("Edit Account")
-def edit_dialog(collection, account_id):
-    account = find_account(collection, account_id)
-    if account is None:
-        st.error("Account not found.")
+@st.dialog("Edit Staff Account")
+def _edit_staff_dialog(uid):
+    rec = _find("mgmt_staff", uid)
+    if not rec:
+        st.error("Record not found.")
         return
-
-    st.caption("Update the login and password for this account.")
-    login = st.text_input("Login ID / Username", value=account["login"], key=f"edit_login_{collection}_{account_id}")
-    password = st.text_input("Password", value=account["password"], key=f"edit_password_{collection}_{account_id}")
-
-    col_cancel, col_confirm = st.columns(2)
-    with col_cancel:
-        if st.button("Cancel", key=f"edit_cancel_{collection}_{account_id}", use_container_width=True):
-            st.rerun()
-    with col_confirm:
-        if st.button("Save Changes", key=f"edit_confirm_{collection}_{account_id}", type="primary", use_container_width=True):
-            if not login.strip() or not password.strip():
-                st.error("Login and password are required.")
-            else:
-                ok, message = update_account(collection, account_id, login.strip(), password.strip())
-                if ok:
-                    st.toast(message, icon="✅")
-                    st.rerun()
-                else:
-                    st.error(message)
+    c1, c2 = st.columns(2)
+    rec["name"]   = c1.text_input("Full Name",   value=rec["name"])
+    rec["dept"]   = c1.selectbox("Department",   DEPARTMENTS, index=DEPARTMENTS.index(rec["dept"]) if rec["dept"] in DEPARTMENTS else 0)
+    rec["role"]   = c2.selectbox("Role",         ROLES, index=ROLES.index(rec["role"]) if rec["role"] in ROLES else 0)
+    rec["email"]  = c2.text_input("Email",       value=rec["email"])
+    rec["phone"]  = c1.text_input("Phone",       value=rec["phone"])
+    rec["status"] = c2.selectbox("Status",       ["Active", "On Leave", "Inactive"], index=["Active", "On Leave", "Inactive"].index(rec["status"]))
+    if st.button("Save Changes", type="primary", use_container_width=True):
+        st.rerun()
 
 
-@st.dialog("Reset Password?")
-def reset_dialog(collection, account_id):
-    account = find_account(collection, account_id)
-    if account is None:
-        st.error("Account not found.")
+@st.dialog("Reset Staff Password")
+def _reset_staff_dialog(uid):
+    rec = _find("mgmt_staff", uid)
+    if not rec:
+        st.error("Record not found.")
         return
+    st.write(f"Reset credentials for **{rec['name']}** (`{rec['username']}`)")
+    mode = st.radio("Mode", ["Auto-generate secure password", "Set custom password"], horizontal=True)
+    if mode == "Auto-generate secure password":
+        new_pwd = _rand_password()
+        st.info(f"🔑 **Generated Password:** `{new_pwd}`")
+    else:
+        new_pwd = st.text_input("New Password", type="password")
+        conf    = st.text_input("Confirm Password", type="password")
+        if new_pwd != conf:
+            st.warning("Passwords do not match.")
+            new_pwd = None
+    if st.button("Confirm Password Reset", type="primary", use_container_width=True) and new_pwd:
+        rec["password"] = new_pwd
+        st.session_state.mgmt_reset_result = {"collection": "mgmt_staff", "uid": uid, "password": new_pwd}
+        st.rerun()
 
-    st.write("Are you sure you want to reset this account's password?")
-    st.caption(f"Account: **{account['login']}**")
 
-    col_cancel, col_confirm = st.columns(2)
-    with col_cancel:
-        if st.button("Cancel", key=f"reset_cancel_{collection}_{account_id}", use_container_width=True):
+@st.dialog("Add New Student Account")
+def _add_student_dialog():
+    c1, c2 = st.columns(2)
+    name     = c1.text_input("Full Name *", placeholder="Student Name")
+    username = c2.text_input("Username *", placeholder="e.g. stu.arjun21")
+    dept     = c1.selectbox("Department", ["CSE", "ECE", "ME", "CE", "EEE"])
+    sem      = c2.selectbox("Semester", ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8"])
+    email    = c1.text_input("Email *", placeholder="student@tve.edu")
+    phone    = c2.text_input("Phone", placeholder="+91 98765 43210")
+    pwd      = _rand_password()
+    st.info(f"🔑 **Generated Temporary Password:** `{pwd}`")
+    if st.button("Create Student Account", type="primary", use_container_width=True):
+        if not (name and username and email):
+            st.error("Name, username and email are required.")
+        elif any(x["username"] == username for x in st.session_state.mgmt_students):
+            st.error("Username already exists in the system.")
+        else:
+            nid = f"TVE-STU-{st.session_state.mgmt_next_id:03d}"
+            st.session_state.mgmt_next_id += 1
+            st.session_state.mgmt_students.append({
+                "id": nid, "name": name, "username": username,
+                "dept": dept, "sem": sem, "email": email,
+                "phone": phone, "status": "Active", "password": pwd,
+            })
             st.rerun()
-    with col_confirm:
-        if st.button("Confirm Reset", key=f"reset_confirm_{collection}_{account_id}", type="primary", use_container_width=True):
-            temp = reset_password(collection, account_id)
-            st.session_state.reset_result = {
-                "collection": collection,
-                "login": account["login"],
-                "temp_password": temp,
-            }
-            st.toast("Password reset.", icon="✅")
-            st.rerun()
 
 
-@st.dialog("Delete Account?")
-def delete_dialog(collection, account_id):
-    account = find_account(collection, account_id)
-    if account is None:
-        st.error("Account not found.")
+@st.dialog("Edit Student Account")
+def _edit_student_dialog(uid):
+    rec = _find("mgmt_students", uid)
+    if not rec:
+        st.error("Record not found.")
         return
-
-    st.write("This action cannot be undone.")
-    st.caption(f"Account: **{account['login']}**")
-
-    col_cancel, col_confirm = st.columns(2)
-    with col_cancel:
-        if st.button("Cancel", key=f"delete_cancel_{collection}_{account_id}", use_container_width=True):
-            st.rerun()
-    with col_confirm:
-        if st.button("Delete", key=f"delete_confirm_{collection}_{account_id}", type="primary", use_container_width=True):
-            delete_account(collection, account_id)
-            st.toast("Account deleted.", icon="✅")
-            st.rerun()
+    c1, c2 = st.columns(2)
+    rec["name"]   = c1.text_input("Full Name",   value=rec["name"])
+    rec["dept"]   = c1.selectbox("Department",   ["CSE", "ECE", "ME", "CE", "EEE"], index=["CSE","ECE","ME","CE","EEE"].index(rec["dept"]) if rec["dept"] in ["CSE","ECE","ME","CE","EEE"] else 0)
+    rec["sem"]    = c2.selectbox("Semester",     ["S1","S2","S3","S4","S5","S6","S7","S8"], index=["S1","S2","S3","S4","S5","S6","S7","S8"].index(rec["sem"]) if rec["sem"] in ["S1","S2","S3","S4","S5","S6","S7","S8"] else 0)
+    rec["email"]  = c2.text_input("Email",       value=rec["email"])
+    rec["phone"]  = c1.text_input("Phone",       value=rec["phone"])
+    rec["status"] = c2.selectbox("Status",       ["Active", "Suspended", "Alumni"], index=["Active", "Suspended", "Alumni"].index(rec["status"]) if rec["status"] in ["Active", "Suspended", "Alumni"] else 0)
+    if st.button("Save Changes", type="primary", use_container_width=True):
+        st.rerun()
 
 
-# ---------------------------------------------------------------------------
-# Page renderers
-# ---------------------------------------------------------------------------
-
-def render_header():
-    left, right = st.columns([5, 1])
-    with left:
-        crumb = "Dashboard" if st.session_state.page == "dashboard" else COLLECTIONS[st.session_state.page]
-        st.markdown(f"### Management Portal")
-        st.caption(f"Manage Staff and Student Accounts &nbsp;·&nbsp; **{crumb}**", unsafe_allow_html=True)
-    with right:
-        if st.session_state.page != "dashboard":
-            st.write("")
-            if st.button("← Back to Dashboard", use_container_width=True):
-                st.session_state.page = "dashboard"
-                st.rerun()
-    st.divider()
-
-
-def render_dashboard():
-    st.subheader("Management Portal")
-    st.caption("Manage Staff and Student Accounts")
-    st.write("")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        with st.container(border=True):
-            st.markdown("#### 🧑‍🏫 Staff Management")
-            st.write("View and manage staff accounts")
-            st.caption(f"{len(st.session_state.staff)} accounts")
-            if st.button("Open Staff Management", key="goto_staff", use_container_width=True):
-                st.session_state.page = "staff"
-                st.rerun()
-
-    with col2:
-        with st.container(border=True):
-            st.markdown("#### 🎓 Student Management")
-            st.write("View and manage student accounts")
-            st.caption(f"{len(st.session_state.students)} accounts")
-            if st.button("Open Student Management", key="goto_students", use_container_width=True):
-                st.session_state.page = "students"
-                st.rerun()
+@st.dialog("Reset Student Password")
+def _reset_student_dialog(uid):
+    rec = _find("mgmt_students", uid)
+    if not rec:
+        st.error("Record not found.")
+        return
+    st.write(f"Reset credentials for **{rec['name']}** (`{rec['username']}`)")
+    mode = st.radio("Mode", ["Auto-generate secure password", "Set custom password"], horizontal=True)
+    if mode == "Auto-generate secure password":
+        new_pwd = _rand_password()
+        st.info(f"🔑 **Generated Password:** `{new_pwd}`")
+    else:
+        new_pwd = st.text_input("New Password", type="password")
+        conf    = st.text_input("Confirm Password", type="password")
+        if new_pwd != conf:
+            st.warning("Passwords do not match.")
+            new_pwd = None
+    if st.button("Confirm Password Reset", type="primary", use_container_width=True) and new_pwd:
+        rec["password"] = new_pwd
+        st.session_state.mgmt_reset_result = {"collection": "mgmt_students", "uid": uid, "password": new_pwd}
+        st.rerun()
 
 
-def render_management_page(collection):
-    label = COLLECTIONS[collection]
-    st.subheader(f"{label} Account Management")
-    st.caption(f"Edit logins, reset passwords, or remove {label.lower()} accounts.")
+# ─── Sub-renders ─────────────────────────────────────────────────────────────
 
-    # show a one-time banner with a freshly reset temp password, if any
-    result = st.session_state.reset_result
-    if result and result["collection"] == collection:
-        with st.container(border=True):
-            st.success(
-                f"Temporary password for **{result['login']}**: `{result['temp_password']}`  "
-                "\n\nShare this with the account holder — it won't be shown again."
-            )
-            if st.button("Dismiss", key=f"dismiss_reset_{collection}"):
-                st.session_state.reset_result = None
-                st.rerun()
-
-    toolbar_left, toolbar_right = st.columns([3, 1])
-    with toolbar_left:
-        search = st.text_input(
-            "Search", placeholder=f"Search {label.lower()} logins…",
-            key=f"search_{collection}", label_visibility="collapsed",
+def _render_mgmt_header():
+    col_t, col_nav = st.columns([4, 1])
+    with col_t:
+        crumb = (
+            "Dashboard"
+            if st.session_state.mgmt_page == "dashboard"
+            else ("Staff Accounts" if st.session_state.mgmt_page == "mgmt_staff" else "Student Accounts")
         )
-    with toolbar_right:
-        if st.button(f"Add {label.rstrip('s')} Account", key=f"add_btn_{collection}", use_container_width=True):
-            add_dialog(collection)
-
-    st.write("")
-
-    query = (search or "").strip().lower()
-    accounts = [a for a in st.session_state[collection] if query in a["login"].lower()]
-
-    if not accounts:
-        st.info("No matching accounts.")
-        return
-
-    header = st.columns([1, 3, 3, 1.3, 1.6, 1.1])
-    for col, text in zip(header, ["ID", "Account Login", "Password", "", "", ""]):
-        col.markdown(f"**{text}**")
-
-    for account in accounts:
-        c_id, c_login, c_pw, c_edit, c_reset, c_delete = st.columns([1, 3, 3, 1.3, 1.6, 1.1])
-        c_id.write(account["id"])
-        c_login.write(account["login"])
-        c_pw.code(mask_password(account["password"]), language=None)
-
-        if c_edit.button("Edit", key=f"edit_{collection}_{account['id']}", use_container_width=True):
-            edit_dialog(collection, account["id"])
-        if c_reset.button("Reset Password", key=f"reset_{collection}_{account['id']}", use_container_width=True):
-            reset_dialog(collection, account["id"])
-        if c_delete.button("Delete", key=f"delete_{collection}_{account['id']}", use_container_width=True):
-            delete_dialog(collection, account["id"])
+        st.markdown(f"<div style='font-size:0.84rem;color:#64748b;font-weight:600;margin-bottom:0.5rem;'>Account Management &nbsp;›&nbsp; <strong style='color:#0f172a;'>{crumb}</strong></div>", unsafe_allow_html=True)
+    with col_nav:
+        if st.session_state.mgmt_page != "dashboard":
+            if st.button("← Back to Hub", key="mgmt_back", use_container_width=True):
+                st.session_state.mgmt_page = "dashboard"
+                st.rerun()
 
 
-# ---------------------------------------------------------------------------
-# Router
-# ---------------------------------------------------------------------------
+def _render_mgmt_dashboard():
+    st.markdown('<div class="page-title">Account Management</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="page-subtitle">Configure, provision and govern staff and student credentials across the campus</div>',
+        unsafe_allow_html=True,
+    )
 
-render_header()
+    c1, c2 = st.columns(2, gap="large")
 
-if st.session_state.page == "dashboard":
-    render_dashboard()
-elif st.session_state.page in ("staff", "students"):
-    render_management_page(st.session_state.page)
+    with c1:
+        active_staff = sum(1 for x in st.session_state.mgmt_staff if x["status"] == "Active")
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+                    border-radius: 16px; padding: 2rem 2.2rem; color: white; margin-bottom: 1.2rem;
+                    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);">
+            <div style="font-size: 0.82rem; color: rgba(255,255,255,0.8); font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem;">
+                Faculty &amp; Staff Accounts
+            </div>
+            <div style="font-family: 'Sora', sans-serif; font-size: 3.2rem; font-weight: 700; line-height: 1;">
+                {len(st.session_state.mgmt_staff)}
+            </div>
+            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); margin-top: 0.6rem;">
+                <strong>{active_staff}</strong> active users &nbsp;·&nbsp; {len(st.session_state.mgmt_staff)-active_staff} on leave / offboarded
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Manage Faculty & Staff Accounts →", key="goto_staff",
+                     use_container_width=True, type="primary"):
+            st.session_state.mgmt_page = "mgmt_staff"
+            st.rerun()
+
+    with c2:
+        active_stu = sum(1 for x in st.session_state.mgmt_students if x["status"] == "Active")
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);
+                    border-radius: 16px; padding: 2rem 2.2rem; color: white; margin-bottom: 1.2rem;
+                    box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.25);">
+            <div style="font-size: 0.82rem; color: rgba(255,255,255,0.8); font-weight: 700;
+                        text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem;">
+                Student Accounts
+            </div>
+            <div style="font-family: 'Sora', sans-serif; font-size: 3.2rem; font-weight: 700; line-height: 1;">
+                {len(st.session_state.mgmt_students)}
+            </div>
+            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85); margin-top: 0.6rem;">
+                <strong>{active_stu}</strong> active enrolled &nbsp;·&nbsp; {len(st.session_state.mgmt_students)-active_stu} suspended / alumni
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("Manage Student Accounts →", key="goto_students",
+                     use_container_width=True, type="primary"):
+            st.session_state.mgmt_page = "mgmt_students"
+            st.rerun()
+
+
+def _render_management_page(collection: str):
+    """Shared CRUD table for both 'mgmt_staff' and 'mgmt_students'."""
+    is_staff = collection == "mgmt_staff"
+    label    = "Faculty / Staff" if is_staff else "Student"
+
+    # ── Password reset notification ───────────────────────────────────────────
+    result = st.session_state.mgmt_reset_result
+    if result and result.get("collection") == collection:
+        st.success(
+            f"✅ Password for **{result['uid']}** reset to: `{result['password']}`  "
+            f"— please deliver securely to user."
+        )
+        st.session_state.mgmt_reset_result = None
+
+    # ── Header + add button ───────────────────────────────────────────────────
+    head_l, head_r = st.columns([3.5, 1.5])
+    head_l.markdown(f'<div class="page-title">{label} Accounts Directory</div>', unsafe_allow_html=True)
+    with head_r:
+        if st.button(f"➕  Add New {label}", type="primary", use_container_width=True):
+            if is_staff:
+                _add_staff_dialog()
+            else:
+                _add_student_dialog()
+
+    # ── Search + filter ───────────────────────────────────────────────────────
+    sf1, sf2 = st.columns([3, 1])
+    search = sf1.text_input("Search", placeholder=f"Search by name, username or email…",
+                             label_visibility="collapsed", key=f"{collection}_search")
+    status_filter = sf2.selectbox(
+        "Status",
+        ["All", "Active", "On Leave", "Inactive", "Suspended"],
+        label_visibility="collapsed",
+        key=f"{collection}_status",
+    )
+
+    records = st.session_state[collection]
+    if search:
+        records = [
+            r for r in records
+            if search.lower() in r["name"].lower()
+            or search.lower() in r["username"].lower()
+            or search.lower() in r["email"].lower()
+        ]
+    if status_filter != "All":
+        records = [r for r in records if r["status"] == status_filter]
+
+    st.markdown(f"<div style='font-size:0.82rem;color:#64748b;margin-bottom:1rem;'>Showing <strong>{len(records)}</strong> registered account(s)</div>",
+                unsafe_allow_html=True)
+
+    # ── Table header ──────────────────────────────────────────────────────────
+    cols_def = [2, 3, 2, 2, 3, 1.5, 2.5]
+    if is_staff:
+        headers = ["ID", "Name / Username", "Role", "Dept", "Email", "Status", "Actions"]
+    else:
+        headers = ["ID", "Name / Username", "Semester", "Dept", "Email", "Status", "Actions"]
+
+    with st.container(border=True):
+        h_cols = st.columns(cols_def)
+        for h, c in zip(headers, h_cols):
+            c.markdown(f"<div style='font-size:0.75rem;font-weight:700;color:#64748b;text-transform:uppercase;padding-bottom:6px;'>{h}</div>",
+                       unsafe_allow_html=True)
+
+        st.markdown("<hr style='border:none;border-top:1px solid #e2e8f0;margin:4px 0 10px 0;'>", unsafe_allow_html=True)
+
+        # ── Rows ──────────────────────────────────────────────────────────────────
+        status_badge = {
+            "Active":    "badge-green",
+            "On Leave":  "badge-amber",
+            "Inactive":  "badge-slate",
+            "Suspended": "badge-red",
+            "Alumni":    "badge-blue",
+        }
+
+        for rec in records:
+            row = st.columns(cols_def)
+            row[0].markdown(f"<div style='font-size:0.82rem;color:#64748b;padding-top:6px;font-family:monospace;'>{rec['id']}</div>",
+                            unsafe_allow_html=True)
+            row[1].markdown(f"""
+                <div style='padding-top:2px;'>
+                    <div style='font-weight:600;color:#0f172a;font-size:0.9rem;'>{rec['name']}</div>
+                    <div style='font-size:0.75rem;color:#64748b;'>@{rec['username']}</div>
+                </div>""", unsafe_allow_html=True)
+            row[2].markdown(f"<div style='padding-top:6px;font-size:0.86rem;color:#334155;'>{rec.get('role', rec.get('sem',''))}</div>",
+                            unsafe_allow_html=True)
+            row[3].markdown(f"<div style='padding-top:6px;font-size:0.86rem;color:#334155;font-weight:600;'>{rec.get('dept','')}</div>",
+                            unsafe_allow_html=True)
+            row[4].markdown(f"<div style='padding-top:6px;font-size:0.84rem;color:#475569;word-break:break-all;'>{rec['email']}</div>",
+                            unsafe_allow_html=True)
+            sb = status_badge.get(rec["status"], "badge-slate")
+            row[5].markdown(f"<div style='padding-top:6px;'><span class='badge {sb}'>{rec['status']}</span></div>",
+                            unsafe_allow_html=True)
+
+            act1, act2, act3, act4 = row[6].columns(4)
+            if act1.button("✏️", key=f"edit_{rec['id']}", help="Edit account details"):
+                if is_staff: _edit_staff_dialog(rec["id"])
+                else:        _edit_student_dialog(rec["id"])
+            if act2.button("🔑", key=f"rst_{rec['id']}", help="Reset password"):
+                if is_staff: _reset_staff_dialog(rec["id"])
+                else:        _reset_student_dialog(rec["id"])
+            if act3.button("🚫", key=f"sus_{rec['id']}", help="Suspend account"):
+                rec["status"] = "Suspended"
+                st.rerun()
+            if act4.button("🗑️", key=f"del_{rec['id']}", help="Delete account"):
+                _delete(collection, rec["id"])
+                st.rerun()
+
+            st.markdown("<hr style='border:none;border-top:1px solid #f1f5f9;margin:6px 0;'>", unsafe_allow_html=True)
+
+    # ── Export ────────────────────────────────────────────────────────────────
+    if records:
+        csv = pd.DataFrame(records).drop(columns=["password"], errors="ignore").to_csv(index=False)
+        st.markdown("<div style='height: 0.5rem'></div>", unsafe_allow_html=True)
+        st.download_button(
+            f"⬇️  Export {label} Accounts (CSV)",
+            data=csv,
+            file_name=f"{label.lower().replace(' / ', '_')}_accounts.csv",
+            mime="text/csv",
+        )
+
+
+# ─── RENDER — called from app.py ────────────────────────────────────────────
+
+def render():
+    """Render the account management page inside the connected TechVerse app."""
+
+    _init_mgmt_state()
+    _render_mgmt_header()
+
+    if st.session_state.mgmt_page == "dashboard":
+        _render_mgmt_dashboard()
+    elif st.session_state.mgmt_page in ("mgmt_staff", "mgmt_students"):
+        _render_management_page(st.session_state.mgmt_page)

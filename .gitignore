@@ -6,6 +6,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
+temp/
 dist/
 downloads/
 eggs/
@@ -79,6 +80,7 @@ dist/
 .env.production.local
 *.pem
 *.key
+.streamlit/secrets.toml
 
 # IDEs and Editors
 .vscode/*
