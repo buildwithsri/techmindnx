@@ -24,7 +24,7 @@ def render(page: str):
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
     .student-hero {
-        background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
         border-radius: 16px;
         padding: 1.8rem 2.2rem;
         margin-bottom: 2rem;
@@ -32,7 +32,7 @@ def render(page: str):
         align-items: center;
         gap: 1.5rem;
         color: white;
-        box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.25);
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.28);
     }
     .student-avatar {
         width: 68px;

@@ -175,29 +175,38 @@ section[data-testid="stSidebar"],
     width: 100% !important;
 }
 
+/* ── General Content & Text Visibility ───────────── */
+p, span, div, label, h1, h2, h3, h4, h5, h6, li {
+    color: #0f172a;
+}
+
 /* ── Form Inputs & Text Contrast ─────────────────── */
-div[data-baseweb="input"] {
+div[data-baseweb="input"],
+div[data-baseweb="base-input"] {
     background-color: #ffffff !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 10px !important;
 }
-div[data-baseweb="input"]:focus-within {
+div[data-baseweb="input"]:focus-within,
+div[data-baseweb="base-input"]:focus-within {
     border-color: #2563eb !important;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }
-div[data-baseweb="input"] input {
-    background-color: transparent !important;
+div[data-baseweb="input"] input,
+div[data-baseweb="base-input"] input,
+div[data-testid="stTextInput"] input {
+    background-color: #ffffff !important;
     color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
     font-size: 0.95rem !important;
 }
-div[data-baseweb="textarea"] {
+div[data-baseweb="textarea"],
+div[data-testid="stTextArea"] textarea {
     background-color: #ffffff !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 10px !important;
-}
-div[data-baseweb="textarea"] textarea {
-    background-color: transparent !important;
     color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
 }
 div[data-testid="stTextInput"] label,
 div[data-testid="stTextInput"] label p,
@@ -208,6 +217,160 @@ div[data-testid="stSelectbox"] label p {
     color: #0f172a !important;
     font-weight: 600 !important;
     font-size: 0.88rem !important;
+}
+
+/* ── Selectbox & Dropdowns ───────────────────────── */
+div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    color: #0f172a !important;
+}
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div {
+    color: #0f172a !important;
+}
+div[data-baseweb="popover"],
+div[data-baseweb="menu"],
+ul[role="listbox"],
+li[role="option"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+li[role="option"]:hover,
+li[role="option"][aria-selected="true"] {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+}
+
+/* ── Main Radio Button Styling (Role Selector) ───── */
+.main div[data-testid="stRadio"] [role="radiogroup"] {
+    gap: 12px !important;
+}
+.main div[data-testid="stRadio"] [role="radiogroup"] > label {
+    background-color: #ffffff !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 10px 18px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+.main div[data-testid="stRadio"] [role="radiogroup"] > label:hover {
+    border-color: #93c5fd !important;
+    background-color: #f8fafc !important;
+}
+.main div[data-testid="stRadio"] [role="radiogroup"] > label:has(input:checked) {
+    background-color: #eff6ff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
+}
+.main div[data-testid="stRadio"] label p,
+.main div[data-testid="stRadio"] label span,
+.main div[data-testid="stRadio"] label div {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    font-size: 0.92rem !important;
+}
+
+/* ── Tabs Styling ────────────────────────────────── */
+button[data-baseweb="tab"] {
+    background: transparent !important;
+    border: none !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+    font-size: 0.92rem !important;
+    padding: 0.7rem 1.4rem !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+button[data-baseweb="tab"]:hover {
+    color: #1e293b !important;
+    background-color: #f1f5f9 !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #2563eb !important;
+    border-bottom: 3px solid #2563eb !important;
+    font-weight: 700 !important;
+}
+button[data-baseweb="tab"] div,
+button[data-baseweb="tab"] p,
+button[data-baseweb="tab"] span {
+    color: inherit !important;
+    font-weight: inherit !important;
+}
+div[data-baseweb="tab-highlight"] {
+    background-color: #2563eb !important;
+}
+
+/* ── Buttons (Secondary / Outline / Suggestion) ──── */
+div.stButton > button {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+div.stButton > button:hover {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+}
+div.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
+}
+div.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38) !important;
+}
+
+/* ── Chatbot Components ──────────────────────────── */
+div[data-testid="stChatInput"] {
+    background-color: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06) !important;
+}
+div[data-testid="stChatInput"]:focus-within {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+div[data-testid="stChatInput"] textarea {
+    background-color: transparent !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
+    font-size: 0.95rem !important;
+}
+div[data-testid="stChatMessage"] {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03) !important;
+    color: #0f172a !important;
+    margin-bottom: 0.75rem !important;
+}
+div[data-testid="stChatMessage"] p,
+div[data-testid="stChatMessage"] div {
+    color: #0f172a !important;
+}
+
+/* ── Dialogs & Modals ────────────────────────────── */
+div[data-testid="stDialog"],
+div[role="dialog"] {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15) !important;
+}
+div[role="dialog"] * {
+    color: #0f172a;
 }
 
 /* ── Typography ──────────────────────────────────── */
@@ -302,21 +465,35 @@ div[data-testid="stSelectbox"] label p {
 .badge-cyan   { background: #cffafe; color: #0e7490; border: 1px solid #a5f3fc; }
 .badge-slate  { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
-/* ── Primary Action Buttons ──────────────────────── */
-div.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    font-weight: 700 !important;
-    font-size: 0.92rem !important;
-    padding: 0.65rem 1.4rem !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
-    transition: all 0.15s ease !important;
+/* ── Section Header & Info Cards ─────────────────── */
+.section-header {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.01em;
 }
-div.stButton > button[kind="primary"]:hover {
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.38) !important;
-    transform: translateY(-1px) !important;
+.info-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+.card-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+.card-value {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #0f172a;
 }
 
 /* ── Hide Streamlit chrome ───────────────────────── */
