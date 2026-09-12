@@ -1,0 +1,47 @@
+{
+  "attendance": {
+    "CS301 - Data Structures": 90,
+    "CS302 - Operating Systems": 78,
+    "CS303 - DBMS": 65,
+    "CS304 - Computer Networks": 82,
+    "CS305 - DSA Lab": 88
+  },
+  "marks": [
+    {"subject": "CS301 - Data Structures", "series_1": 28, "series_2": 26, "assignment": 9, "total": 63},
+    {"subject": "CS302 - Operating Systems", "series_1": 22, "series_2": 24, "assignment": 8, "total": 54},
+    {"subject": "CS303 - DBMS", "series_1": 25, "series_2": 27, "assignment": 10, "total": 62},
+    {"subject": "CS304 - Computer Networks", "series_1": 20, "series_2": 23, "assignment": 7, "total": 50},
+    {"subject": "CS305 - DSA Lab", "series_1": 38, "series_2": 40, "assignment": 15, "total": 93}
+  ],
+  "events": [
+    {"name": "National Hackathon 2026",     "date": "2026-10-05", "type": "Technical", "status": "Registered",    "team": "CodeStorm"},
+    {"name": "Inter-College Debate",         "date": "2026-09-20", "type": "Cultural",  "status": "Shortlisted",   "team": "Solo"},
+    {"name": "IEEE Paper Presentation",      "date": "2026-10-15", "type": "Research",  "status": "Submitted",     "team": "CodeStorm"},
+    {"name": "TechFest 2026 — Tech Quiz",    "date": "2026-11-01", "type": "Technical", "status": "Registered",    "team": "Solo"},
+    {"name": "Cultural Night — Street Play", "date": "2026-09-25", "type": "Cultural",  "status": "Participating", "team": "Drama Club"}
+  ],
+  "fees": [
+    {"semester": "S1 (2022-23)", "amount": 45000, "status": "Paid",    "date": "2022-08-10", "mode": "Online — UPI",   "receipt": "TVE-R-2201"},
+    {"semester": "S2 (2022-23)", "amount": 42000, "status": "Paid",    "date": "2023-01-05", "mode": "Online — NEFT",  "receipt": "TVE-R-2302"},
+    {"semester": "S3 (2023-24)", "amount": 45000, "status": "Paid",    "date": "2023-07-22", "mode": "Cash — Counter", "receipt": "TVE-R-2403"},
+    {"semester": "S4 (2023-24)", "amount": 43000, "status": "Paid",    "date": "2024-01-10", "mode": "Online — UPI",   "receipt": "TVE-R-2504"},
+    {"semester": "S5 (2024-25)", "amount": 47000, "status": "Paid",    "date": "2024-07-15", "mode": "DD — Bank",      "receipt": "TVE-R-2605"},
+    {"semester": "S6 (2025-26)", "amount": 47000, "status": "Pending", "date": "—",           "mode": "—",             "receipt": "—"}
+  ],
+  "profile": {
+    "department":       "Computer Science & Engineering",
+    "section":          "CSE-A",
+    "semester":         "6",
+    "academic_year":    "2022-26",
+    "hostel":           "Not Applicable",
+    "bus_route":        "Route 7 — Kakkanad - TVC campus",
+    "advisor":          "Dr. Arjun Nair",
+    "mentor":           "Prof. Meera Pillai",
+    "scholarship":      "Merit Scholarship (AICTE)",
+    "blood_group":      "B+",
+    "address":          "12 Skyline Apartments, Kakkanad, Kochi - 682030",
+    "guardian":         "Rajan Sharma",
+    "guardian_phone":   "+91 94460 87654",
+    "hometown":         "Kochi, Kerala"
+  }
+}

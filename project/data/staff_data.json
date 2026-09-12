@@ -1,0 +1,46 @@
+{
+  "departments": ["CSE", "ECE", "ME", "CE", "EEE"],
+  "batches": ["2022-26", "2023-27", "2024-28", "2021-25"],
+  "sections": [
+    {"id": "CSE-A", "dept": "CSE", "semester": "S6", "batch": "2022-26", "strength": 60, "advisor": "Dr. Arjun Nair",   "room": "CS-301"},
+    {"id": "CSE-B", "dept": "CSE", "semester": "S6", "batch": "2022-26", "strength": 58, "advisor": "Dr. Meera Pillai", "room": "CS-302"},
+    {"id": "ECE-A", "dept": "ECE", "semester": "S4", "batch": "2023-27", "strength": 55, "advisor": "Dr. Sreejith R.",  "room": "EC-201"},
+    {"id": "ME-A",  "dept": "ME",  "semester": "S4", "batch": "2023-27", "strength": 52, "advisor": "Prof. Binu K.",    "room": "ME-101"},
+    {"id": "CE-A",  "dept": "CE",  "semester": "S2", "batch": "2024-28", "strength": 50, "advisor": "Prof. Anitha S.",  "room": "CV-102"},
+    {"id": "EEE-A", "dept": "EEE", "semester": "S6", "batch": "2022-26", "strength": 48, "advisor": "Dr. Rajesh T.",    "room": "EE-303"}
+  ],
+  "subjects": [
+    {"code": "CS301", "name": "Data Structures & Algorithms",  "dept": "CSE", "sem": "S6", "credits": 4, "type": "Theory", "faculty": "Dr. Arjun Nair",   "enrolled": 118},
+    {"code": "CS302", "name": "Operating Systems",             "dept": "CSE", "sem": "S6", "credits": 4, "type": "Theory", "faculty": "Dr. Meera Pillai",  "enrolled": 118},
+    {"code": "CS303", "name": "Database Management Systems",   "dept": "CSE", "sem": "S6", "credits": 3, "type": "Theory", "faculty": "Prof. Ravi Kumar",  "enrolled": 118},
+    {"code": "CS304", "name": "Computer Networks",             "dept": "CSE", "sem": "S6", "credits": 3, "type": "Theory", "faculty": "Dr. Suja Menon",    "enrolled": 118},
+    {"code": "CS305", "name": "DSA Lab",                       "dept": "CSE", "sem": "S6", "credits": 2, "type": "Lab",    "faculty": "Dr. Arjun Nair",   "enrolled": 118},
+    {"code": "CS306", "name": "DBMS Lab",                      "dept": "CSE", "sem": "S6", "credits": 2, "type": "Lab",    "faculty": "Prof. Ravi Kumar",  "enrolled": 118},
+    {"code": "EC401", "name": "VLSI Design",                   "dept": "ECE", "sem": "S4", "credits": 4, "type": "Theory", "faculty": "Dr. Sreejith R.",   "enrolled": 55},
+    {"code": "EC402", "name": "Digital Signal Processing",     "dept": "ECE", "sem": "S4", "credits": 4, "type": "Theory", "faculty": "Dr. Priya Varma",   "enrolled": 55},
+    {"code": "ME301", "name": "Thermodynamics",                "dept": "ME",  "sem": "S4", "credits": 4, "type": "Theory", "faculty": "Prof. Binu K.",      "enrolled": 52},
+    {"code": "ME302", "name": "Fluid Mechanics",               "dept": "ME",  "sem": "S4", "credits": 3, "type": "Theory", "faculty": "Dr. Arun George",   "enrolled": 52},
+    {"code": "EE501", "name": "Power Systems",                 "dept": "EEE", "sem": "S6", "credits": 4, "type": "Theory", "faculty": "Dr. Rajesh T.",     "enrolled": 48},
+    {"code": "HS101", "name": "Engineering Mathematics",       "dept": "All", "sem": "S2", "credits": 4, "type": "Theory", "faculty": "Dr. Lekha V.",      "enrolled": 323},
+    {"code": "HS102", "name": "Engineering Physics",           "dept": "All", "sem": "S2", "credits": 3, "type": "Theory", "faculty": "Dr. Thomas J.",     "enrolled": 323}
+  ],
+  "students": [
+    {"reg": "TVE22CS001", "name": "Aditya Sharma",   "section": "CSE-A", "dept": "CSE", "sem": "S6", "batch": "2022-26", "gender": "M", "dob": "2003-04-10", "email": "aditya@tve.edu",   "phone": "9876501001", "cgpa": 8.9, "guardian": "Rajan Sharma",  "city": "Kochi"},
+    {"reg": "TVE22CS002", "name": "Bhavana Nair",    "section": "CSE-A", "dept": "CSE", "sem": "S6", "batch": "2022-26", "gender": "F", "dob": "2003-07-21", "email": "bhavana@tve.edu",  "phone": "9876501002", "cgpa": 9.2, "guardian": "Suresh Nair",   "city": "Thrissur"},
+    {"reg": "TVE22CS003", "name": "Chetan Pillai",   "section": "CSE-A", "dept": "CSE", "sem": "S6", "batch": "2022-26", "gender": "M", "dob": "2003-01-15", "email": "chetan@tve.edu",   "phone": "9876501003", "cgpa": 7.8, "guardian": "Mohan Pillai",  "city": "Ernakulam"},
+    {"reg": "TVE22CS004", "name": "Deepthi Menon",   "section": "CSE-B", "dept": "CSE", "sem": "S6", "batch": "2022-26", "gender": "F", "dob": "2003-09-05", "email": "deepthi@tve.edu",  "phone": "9876501004", "cgpa": 8.5, "guardian": "Anoop Menon",   "city": "Palakkad"},
+    {"reg": "TVE22CS005", "name": "Edwin Jose",      "section": "CSE-B", "dept": "CSE", "sem": "S6", "batch": "2022-26", "gender": "M", "dob": "2003-11-30", "email": "edwin@tve.edu",    "phone": "9876501005", "cgpa": 6.9, "guardian": "Biju Jose",      "city": "Kottayam"},
+    {"reg": "TVE23EC001", "name": "Fathima Rasheed", "section": "ECE-A", "dept": "ECE", "sem": "S4", "batch": "2023-27", "gender": "F", "dob": "2004-02-18", "email": "fathima@tve.edu",  "phone": "9876501006", "cgpa": 8.1, "guardian": "Abdul Rasheed", "city": "Kozhikode"},
+    {"reg": "TVE23EC002", "name": "Gautham Iyer",    "section": "ECE-A", "dept": "ECE", "sem": "S4", "batch": "2023-27", "gender": "M", "dob": "2004-06-09", "email": "gautham@tve.edu",  "phone": "9876501007", "cgpa": 7.5, "guardian": "Srini Iyer",    "city": "Chennai"},
+    {"reg": "TVE23ME001", "name": "Hari Krishna",    "section": "ME-A",  "dept": "ME",  "sem": "S4", "batch": "2023-27", "gender": "M", "dob": "2004-08-22", "email": "hari@tve.edu",     "phone": "9876501008", "cgpa": 7.2, "guardian": "Gopalan K.",    "city": "Thrissur"},
+    {"reg": "TVE24CE001", "name": "Ishita Varma",    "section": "CE-A",  "dept": "CE",  "sem": "S2", "batch": "2024-28", "gender": "F", "dob": "2005-03-14", "email": "ishita@tve.edu",   "phone": "9876501009", "cgpa": 8.7, "guardian": "Pradeep Varma", "city": "Calicut"},
+    {"reg": "TVE22EE001", "name": "Jijo Thomas",     "section": "EEE-A", "dept": "EEE", "sem": "S6", "batch": "2022-26", "gender": "M", "dob": "2003-12-01", "email": "jijo@tve.edu",     "phone": "9876501010", "cgpa": 8.3, "guardian": "Thomas P.",     "city": "Alappuzha"}
+  ],
+  "cse_subjects": [
+    "Data Structures & Algorithms",
+    "Operating Systems",
+    "Database Management Systems",
+    "Computer Networks",
+    "DSA Lab"
+  ]
+}

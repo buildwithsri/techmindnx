@@ -1,0 +1,83 @@
+{
+  "management": {
+    "admin.jose": {
+      "password": "Faculty#103",
+      "display_name": "Admin Jose",
+      "title": "System Administrator",
+      "initials": "AJ"
+    },
+    "admin": {
+      "password": "admin",
+      "display_name": "Administrator",
+      "title": "Principal & Admin",
+      "initials": "SA"
+    }
+  },
+  "staff": {
+    "prof.rao": {
+      "password": "Faculty#101",
+      "display_name": "Prof. Rao",
+      "title": "Assoc. Professor · CSE",
+      "initials": "PR"
+    },
+    "dr.menon": {
+      "password": "Faculty#102",
+      "display_name": "Dr. Menon",
+      "title": "Professor · ECE",
+      "initials": "DM"
+    },
+    "lib.anu": {
+      "password": "Faculty#104",
+      "display_name": "Lib. Anu",
+      "title": "Chief Librarian",
+      "initials": "LA"
+    }
+  },
+  "student": {
+    "stu.arjun21": {
+      "password": "Student#201",
+      "display_name": "Aditya Sharma",
+      "title": "CSE · Sem 6 · 2022-26",
+      "reg": "TVE22CS001",
+      "dept": "Computer Science & Engineering",
+      "sem": "6",
+      "initials": "AS"
+    },
+    "stu.divya22": {
+      "password": "Student#202",
+      "display_name": "Bhavana Nair",
+      "title": "CSE · Sem 6 · 2022-26",
+      "reg": "TVE22CS002",
+      "dept": "Computer Science & Engineering",
+      "sem": "6",
+      "initials": "BN"
+    },
+    "stu.farhan23": {
+      "password": "Student#203",
+      "display_name": "Chetan Pillai",
+      "title": "CSE · Sem 6 · 2022-26",
+      "reg": "TVE22CS003",
+      "dept": "Computer Science & Engineering",
+      "sem": "6",
+      "initials": "CP"
+    },
+    "stu.leah24": {
+      "password": "Student#204",
+      "display_name": "Deepthi Menon",
+      "title": "CSE · Sem 6 · 2022-26",
+      "reg": "TVE22CS004",
+      "dept": "Computer Science & Engineering",
+      "sem": "6",
+      "initials": "DM"
+    },
+    "stu.nihal25": {
+      "password": "Student#205",
+      "display_name": "Edwin Jose",
+      "title": "CSE · Sem 6 · 2022-26",
+      "reg": "TVE22CS005",
+      "dept": "Computer Science & Engineering",
+      "sem": "6",
+      "initials": "EJ"
+    }
+  }
+}

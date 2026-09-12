@@ -1,0 +1,107 @@
+{
+  "departments": ["CSE", "ECE", "ME", "CE", "EEE", "Admin", "LIB"],
+  "roles": ["Faculty", "HOD", "Admin", "Librarian", "Lab Staff"],
+  "seed_staff": [
+    {
+      "id": "TVE-STF-001",
+      "name": "Dr. Arjun Nair",
+      "username": "prof.rao",
+      "role": "Faculty",
+      "dept": "CSE",
+      "email": "arjun@tve.edu",
+      "phone": "+91 94460 12345",
+      "status": "Active",
+      "password": "Faculty#101"
+    },
+    {
+      "id": "TVE-STF-002",
+      "name": "Dr. Meera Pillai",
+      "username": "dr.menon",
+      "role": "Faculty",
+      "dept": "ECE",
+      "email": "meera@tve.edu",
+      "phone": "+91 94460 67890",
+      "status": "Active",
+      "password": "Faculty#102"
+    },
+    {
+      "id": "TVE-STF-003",
+      "name": "Admin Jose",
+      "username": "admin.jose",
+      "role": "Admin",
+      "dept": "Admin",
+      "email": "jose@tve.edu",
+      "phone": "+91 98001 11223",
+      "status": "Active",
+      "password": "Faculty#103"
+    },
+    {
+      "id": "TVE-STF-004",
+      "name": "Lib. Anu",
+      "username": "lib.anu",
+      "role": "Librarian",
+      "dept": "LIB",
+      "email": "anu@tve.edu",
+      "phone": "+91 96330 55678",
+      "status": "On Leave",
+      "password": "Faculty#104"
+    }
+  ],
+  "seed_students": [
+    {
+      "id": "TVE-STU-001",
+      "name": "Aditya Sharma",
+      "username": "stu.arjun21",
+      "dept": "CSE",
+      "sem": "S6",
+      "email": "aditya@tve.edu",
+      "phone": "+91 98765 43210",
+      "status": "Active",
+      "password": "Student#201"
+    },
+    {
+      "id": "TVE-STU-002",
+      "name": "Bhavana Nair",
+      "username": "stu.divya22",
+      "dept": "CSE",
+      "sem": "S6",
+      "email": "bhavana@tve.edu",
+      "phone": "+91 98765 43211",
+      "status": "Active",
+      "password": "Student#202"
+    },
+    {
+      "id": "TVE-STU-003",
+      "name": "Chetan Pillai",
+      "username": "stu.farhan23",
+      "dept": "CSE",
+      "sem": "S6",
+      "email": "chetan@tve.edu",
+      "phone": "+91 98765 43212",
+      "status": "Active",
+      "password": "Student#203"
+    },
+    {
+      "id": "TVE-STU-004",
+      "name": "Deepthi Menon",
+      "username": "stu.leah24",
+      "dept": "CSE",
+      "sem": "S6",
+      "email": "deepthi@tve.edu",
+      "phone": "+91 98765 43213",
+      "status": "Suspended",
+      "password": "Student#204"
+    },
+    {
+      "id": "TVE-STU-005",
+      "name": "Edwin Jose",
+      "username": "stu.nihal25",
+      "dept": "CSE",
+      "sem": "S6",
+      "email": "edwin@tve.edu",
+      "phone": "+91 98765 43214",
+      "status": "Active",
+      "password": "Student#205"
+    }
+  ]
+}

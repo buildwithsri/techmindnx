@@ -8,6 +8,7 @@ Run with:
 """
 
 import streamlit as st
+from utils import load_json
 
 # ── Page config (must be the very first Streamlit call) ───────────────────────
 st.set_page_config(
@@ -18,91 +19,9 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# CREDENTIAL STORE
+# LOAD CREDENTIALS FROM JSON DATA STORE
 # ─────────────────────────────────────────────────────────────────────────────
-USERS = {
-    "management": {
-        "admin.jose": {
-            "password":     "Faculty#103",
-            "display_name": "Admin Jose",
-            "title":        "System Administrator",
-            "initials":     "AJ",
-        },
-        "admin": {
-            "password":     "admin",
-            "display_name": "Administrator",
-            "title":        "Principal & Admin",
-            "initials":     "SA",
-        },
-    },
-    "staff": {
-        "prof.rao": {
-            "password":     "Faculty#101",
-            "display_name": "Prof. Rao",
-            "title":        "Assoc. Professor · CSE",
-            "initials":     "PR",
-        },
-        "dr.menon": {
-            "password":     "Faculty#102",
-            "display_name": "Dr. Menon",
-            "title":        "Professor · ECE",
-            "initials":     "DM",
-        },
-        "lib.anu": {
-            "password":     "Faculty#104",
-            "display_name": "Lib. Anu",
-            "title":        "Chief Librarian",
-            "initials":     "LA",
-        },
-    },
-    "student": {
-        "stu.arjun21": {
-            "password":     "Student#201",
-            "display_name": "Aditya Sharma",
-            "title":        "CSE · Sem 6 · 2022-26",
-            "reg":          "TVE22CS001",
-            "dept":         "Computer Science & Engineering",
-            "sem":          "6",
-            "initials":     "AS",
-        },
-        "stu.divya22": {
-            "password":     "Student#202",
-            "display_name": "Bhavana Nair",
-            "title":        "CSE · Sem 6 · 2022-26",
-            "reg":          "TVE22CS002",
-            "dept":         "Computer Science & Engineering",
-            "sem":          "6",
-            "initials":     "BN",
-        },
-        "stu.farhan23": {
-            "password":     "Student#203",
-            "display_name": "Chetan Pillai",
-            "title":        "CSE · Sem 6 · 2022-26",
-            "reg":          "TVE22CS003",
-            "dept":         "Computer Science & Engineering",
-            "sem":          "6",
-            "initials":     "CP",
-        },
-        "stu.leah24": {
-            "password":     "Student#204",
-            "display_name": "Deepthi Menon",
-            "title":        "CSE · Sem 6 · 2022-26",
-            "reg":          "TVE22CS004",
-            "dept":         "Computer Science & Engineering",
-            "sem":          "6",
-            "initials":     "DM",
-        },
-        "stu.nihal25": {
-            "password":     "Student#205",
-            "display_name": "Edwin Jose",
-            "title":        "CSE · Sem 6 · 2022-26",
-            "reg":          "TVE22CS005",
-            "dept":         "Computer Science & Engineering",
-            "sem":          "6",
-            "initials":     "EJ",
-        },
-    },
-}
+USERS = load_json("users.json")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # NAVIGATION MAPS
@@ -152,7 +71,7 @@ def _init_state():
 _init_state()
 
 # ─────────────────────────────────────────────────────────────────────────────
-# GLOBAL LIGHT THEME DESIGN SYSTEM
+# GLOBAL LIGHT THEME & 20/80 WIDTH PROPORTIONS
 # ─────────────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -164,14 +83,19 @@ html, body, [class*="css"], .stApp {
     color: #0f172a !important;
 }
 
-/* ── Light Sidebar & Seamless Navigation ──────────── */
+/* ── Sidebar Width: Strictly 20% - 25% (260px - 280px) ──────────────────── */
+section[data-testid="stSidebar"],
 [data-testid="stSidebar"] {
+    width: 270px !important;
+    min-width: 260px !important;
+    max-width: 290px !important;
     background-color: #ffffff !important;
     border-right: 1px solid #e2e8f0 !important;
-    padding-top: 1rem !important;
+    box-shadow: 2px 0 12px rgba(15, 23, 42, 0.02) !important;
 }
-[data-testid="stSidebar"] * {
-    color: #334155 !important;
+
+[data-testid="stSidebarContent"] {
+    padding: 1.2rem 0.9rem !important;
 }
 
 /* Hide default radio circle bullets & labels in sidebar */
@@ -179,7 +103,7 @@ html, body, [class*="css"], .stApp {
     display: none !important;
 }
 [data-testid="stSidebar"] div[data-testid="stRadio"] [role="radiogroup"] {
-    gap: 4px !important;
+    gap: 5px !important;
 }
 [data-testid="stSidebar"] div[data-testid="stRadio"] [role="radiogroup"] > label > div:first-child,
 [data-testid="stSidebar"] div[data-testid="stRadio"] input[type="radio"] {
@@ -241,6 +165,16 @@ html, body, [class*="css"], .stApp {
     box-shadow: 0 4px 12px rgba(225, 29, 72, 0.1) !important;
 }
 
+/* ── Main Content Area: Takes 75% - 80% with generous breathing room ───────── */
+.main {
+    width: 100% !important;
+}
+.main .block-container {
+    padding: 2.2rem 3.5rem 4rem !important;
+    max-width: 1500px !important;
+    width: 100% !important;
+}
+
 /* ── Form Inputs & Text Contrast ─────────────────── */
 div[data-baseweb="input"] {
     background-color: #ffffff !important;
@@ -276,37 +210,30 @@ div[data-testid="stSelectbox"] label p {
     font-size: 0.88rem !important;
 }
 
-/* ── Main Container Layout ───────────────────────── */
-.main .block-container {
-    padding: 2.2rem 3rem 4rem !important;
-    max-width: 1380px !important;
-    background: transparent !important;
-}
-
 /* ── Typography ──────────────────────────────────── */
 .page-title {
     font-family: 'Sora', sans-serif !important;
-    font-size: 2rem !important;
+    font-size: 2.1rem !important;
     font-weight: 800 !important;
     color: #0f172a !important;
     letter-spacing: -0.025em !important;
     margin-bottom: 0.25rem !important;
 }
 .page-subtitle {
-    font-size: 0.94rem !important;
+    font-size: 0.95rem !important;
     color: #64748b !important;
     margin-bottom: 1.8rem !important;
     line-height: 1.5 !important;
 }
 
-/* ── Stat Cards Grid (5-column equal layout) ─────── */
+/* ── Symmetrical 5-Column Metric Grid ────────────── */
 .stat-grid-5 {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 1.1rem;
+    gap: 1.2rem;
     margin-bottom: 2rem;
 }
-@media (max-width: 1150px) {
+@media (max-width: 1200px) {
     .stat-grid-5 {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -341,7 +268,7 @@ div[data-testid="stSelectbox"] label p {
 }
 .stat-card .value {
     font-family: 'Sora', sans-serif;
-    font-size: 2.1rem;
+    font-size: 2.15rem;
     font-weight: 800;
     color: #0f172a;
     line-height: 1.1;
@@ -356,19 +283,6 @@ div[data-testid="stSelectbox"] label p {
     height: 4px;
     border-radius: 3px;
     margin-bottom: 0.75rem;
-}
-
-/* ── Section Header ──────────────────────────────── */
-.section-header {
-    font-family: 'Sora', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 0.9rem;
-    border-left: 4px solid #2563eb;
-    padding-left: 0.75rem;
-    display: flex;
-    align-items: center;
 }
 
 /* ── Badges ──────────────────────────────────────── */
@@ -396,7 +310,7 @@ div.stButton > button[kind="primary"] {
     border-radius: 10px !important;
     font-weight: 700 !important;
     font-size: 0.92rem !important;
-    padding: 0.6rem 1.4rem !important;
+    padding: 0.65rem 1.4rem !important;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
     transition: all 0.15s ease !important;
 }
@@ -431,8 +345,8 @@ def _render_login():
     <style>
     section[data-testid="stSidebar"] { display: none !important; }
     .main .block-container {
-        padding: 3rem 1.5rem !important;
-        max-width: 900px !important;
+        padding: 3.5rem 1.5rem !important;
+        max-width: 850px !important;
         margin: 0 auto !important;
     }
     .brand-title {
@@ -452,7 +366,6 @@ def _render_login():
     </style>
     """, unsafe_allow_html=True)
 
-    # Centered Header
     st.markdown("""
     <div style='text-align: center; margin-bottom: 2rem;'>
         <div style='display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px;
@@ -465,7 +378,7 @@ def _render_login():
     </div>
     """, unsafe_allow_html=True)
 
-    col_l, col_center, col_r = st.columns([1, 2.4, 1])
+    col_l, col_center, col_r = st.columns([1, 2.6, 1])
 
     with col_center:
         with st.container(border=True):
@@ -514,7 +427,7 @@ def _render_login():
                 key="login_pwd",
             )
 
-            st.markdown("<div style='height: 0.3rem'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 0.4rem'></div>", unsafe_allow_html=True)
 
             if st.button("Sign In  →", use_container_width=True, type="primary", key="login_btn"):
                 info = _authenticate(role, username.strip(), password)
@@ -575,8 +488,8 @@ def _render_sidebar():
     with st.sidebar:
         # Brand block
         st.markdown("""
-        <div style='padding: 0.8rem 0.2rem 1.1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.2rem;'>
-            <div style='display: flex; align-items: center; gap: 11px;'>
+        <div style='padding: 0.6rem 0.1rem 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.1rem;'>
+            <div style='display: flex; align-items: center; gap: 10px;'>
                 <div style='font-size: 1.85rem;'>🏛️</div>
                 <div>
                     <div style='font-family: "Sora", sans-serif; font-size: 1.05rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;'>
@@ -592,8 +505,8 @@ def _render_sidebar():
 
         st.markdown("""
         <div style='font-size: 0.68rem; color: #94a3b8; text-transform: uppercase;
-                    letter-spacing: 0.08em; font-weight: 700; padding-left: 6px;
-                    margin-bottom: 8px;'>Navigation Menu</div>
+                    letter-spacing: 0.08em; font-weight: 700; padding-left: 4px;
+                    margin-bottom: 6px;'>Navigation Menu</div>
         """, unsafe_allow_html=True)
 
         current_idx = (
@@ -619,26 +532,24 @@ def _render_sidebar():
         title = user_info.get("title", "")
 
         st.markdown(f"""
-        <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 1.5rem 0 1rem;'>
-        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.9rem; margin-bottom: 0.9rem;'>
-            <div style='display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;'>
-                <div style='display: flex; align-items: center; gap: 9px;'>
-                    <div style='width: 36px; height: 36px; border-radius: 50%; background: #eff6ff; border: 1px solid #bfdbfe;
-                                color: #2563eb; font-weight: 800; font-family: "Sora", sans-serif;
-                                display: flex; align-items: center; justify-content: center; font-size: 0.88rem;'>
-                        {initials}
+        <hr style='border: none; border-top: 1px solid #e2e8f0; margin: 1.4rem 0 0.9rem;'>
+        <div style='background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; margin-bottom: 0.85rem;'>
+            <div style='display: flex; align-items: center; gap: 10px; margin-bottom: 6px;'>
+                <div style='width: 36px; height: 36px; border-radius: 50%; background: #eff6ff; border: 1px solid #bfdbfe;
+                            color: #2563eb; font-weight: 800; font-family: "Sora", sans-serif;
+                            display: flex; align-items: center; justify-content: center; font-size: 0.88rem; flex-shrink: 0;'>
+                    {initials}
+                </div>
+                <div style='overflow: hidden;'>
+                    <div style='font-weight: 700; font-size: 0.86rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                        {display_name}
                     </div>
-                    <div>
-                        <div style='font-weight: 700; font-size: 0.88rem; color: #0f172a;'>
-                            {display_name}
-                        </div>
-                        <div style='font-size: 0.72rem; color: #64748b;'>
-                            {title}
-                        </div>
+                    <div style='font-size: 0.72rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                        {title}
                     </div>
                 </div>
             </div>
-            <div style='text-align: right; margin-top: 4px;'>
+            <div style='text-align: right;'>
                 <span class='badge {role_color_badge}'>{role_label}</span>
             </div>
         </div>
@@ -704,23 +615,20 @@ def _render_mgmt_dashboard():
     </div>
     """, unsafe_allow_html=True)
 
-    # 2 Big Action Cards
+    # 2 Action Cards
     c1, c2 = st.columns(2, gap="large")
     with c1:
         st.markdown("""
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.8rem;
-                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); margin-bottom: 1rem; min-height: 200px;
-                    display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem;">
-                    <div style="font-size: 1.8rem;">👥</div>
-                    <div style="font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 700; color: #0f172a;">
-                        Account Management
-                    </div>
+                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); margin-bottom: 1.2rem; min-height: 180px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem;">
+                <div style="font-size: 1.8rem;">👥</div>
+                <div style="font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 700; color: #0f172a;">
+                    Account Management
                 </div>
-                <div style="font-size: 0.88rem; color: #64748b; line-height: 1.55;">
-                    Create, edit, reset passwords, or manage credentials and access privileges for all staff and student portal users.
-                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: #64748b; line-height: 1.55;">
+                Create, edit, reset passwords, or manage credentials and access privileges for all staff and student portal users.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -734,18 +642,15 @@ def _render_mgmt_dashboard():
     with c2:
         st.markdown("""
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.8rem;
-                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); margin-bottom: 1rem; min-height: 200px;
-                    display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem;">
-                    <div style="font-size: 1.8rem;">📋</div>
-                    <div style="font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 700; color: #0f172a;">
-                        Student Registration
-                    </div>
+                    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04); margin-bottom: 1.2rem; min-height: 180px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.6rem;">
+                <div style="font-size: 1.8rem;">📋</div>
+                <div style="font-family: 'Sora', sans-serif; font-size: 1.25rem; font-weight: 700; color: #0f172a;">
+                    Student Registration
                 </div>
-                <div style="font-size: 0.88rem; color: #64748b; line-height: 1.55;">
-                    Register new students with department assignment, contact records, emergency contacts, and photo verification.
-                </div>
+            </div>
+            <div style="font-size: 0.88rem; color: #64748b; line-height: 1.55;">
+                Register new students with department assignment, contact records, emergency contacts, and photo verification.
             </div>
         </div>
         """, unsafe_allow_html=True)
