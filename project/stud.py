@@ -144,7 +144,7 @@ def render(page: str):
         pending  = sum(f["amount"] for f in FEES if f["status"] == "Pending")
 
         st.markdown(f"""
-        <div class="stat-row">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.1rem;margin-bottom:2rem;">
             <div class="stat-card">
                 <div class="accent-bar" style="background:#10b981;"></div>
                 <div class="label">Avg Attendance</div>

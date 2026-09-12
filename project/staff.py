@@ -177,7 +177,7 @@ def render(page: str):
         st.markdown('<div class="page-subtitle">Academic snapshot & department telemetry — Even Semester 2025-26 · TechVerse Engineering College</div>', unsafe_allow_html=True)
 
         st.markdown("""
-        <div class="stat-row">
+        <div class="stat-grid-5">
             <div class="stat-card">
                 <div class="accent-bar" style="background:#0ea5e9;"></div>
                 <div class="label">Total Students</div><div class="value">323</div>
