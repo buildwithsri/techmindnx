@@ -1,7 +1,7 @@
 """
 TechVerse ERP — Module 05: AI Engineer Lab & Computer Vision Surveillance
-Integrates real-time object detection, contraband detection, student spatial association,
-and ID card compliance with live webcam / CCTV feeds.
+Real-time continuous webcam streaming, object detection, contraband detection,
+student spatial association, and ID card compliance.
 """
 
 import streamlit as st
@@ -108,7 +108,6 @@ def process_vision_frame(img_bgr, conf_thresh=0.35, camera_id="exam_hall_01"):
         except Exception:
             id_card_detected = True
     else:
-        # Fallback: check if persons exist
         id_card_detected = len(students) > 0
 
     # Spatial association & violation check
@@ -127,27 +126,27 @@ def process_vision_frame(img_bgr, conf_thresh=0.35, camera_id="exam_hall_01"):
                 })
 
     # Draw Bounding Boxes with stylish high-contrast visuals
-    # 1. Students (Green / Blue)
+    # 1. Students (Blue / Emerald)
     for i, s in enumerate(students):
         x1, y1, x2, y2 = s["box"]
-        color = (37, 99, 235)  # Blue
+        color = (235, 99, 37)  # Vibrant Blue (BGR)
         cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 2)
         tag = f"Student #{i+1} ({s['confidence']}%)"
         (tw, th), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
         cv2.rectangle(annotated, (x1, max(0, y1 - 22)), (x1 + tw + 10, y1), color, -1)
         cv2.putText(annotated, tag, (x1 + 5, max(14, y1 - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA)
 
-    # 2. Contraband / Devices (Red / Crimson)
+    # 2. Contraband / Devices (Crimson Red)
     for c in contraband:
         x1, y1, x2, y2 = c["box"]
-        color = (0, 0, 225)  # Red
+        color = (0, 0, 225)  # Crimson Red (BGR)
         cv2.rectangle(annotated, (x1, y1), (x2, y2), color, 3)
         tag = f"ALERT: {c['class'].upper()} {c['confidence']}%"
         (tw, th), _ = cv2.getTextSize(tag, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 2)
         cv2.rectangle(annotated, (x1, max(0, y1 - 24)), (x1 + tw + 10, y1), color, -1)
         cv2.putText(annotated, tag, (x1 + 5, max(16, y1 - 6)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2, cv2.LINE_AA)
 
-    # 3. Other objects (Slate / Cyan)
+    # 3. Other detected objects
     for o in other_items:
         x1, y1, x2, y2 = o["box"]
         color = (180, 100, 30)
@@ -189,25 +188,19 @@ def generate_synthetic_cctv_frame(scene="exam_hall"):
         # Book on desk 2
         cv2.rectangle(img, (390, 310), (450, 360), (200, 220, 230), -1)
 
-    elif scene == "library":
-        # Book shelf background
-        for x in range(50, 600, 60):
-            cv2.rectangle(img, (x, 70), (x + 50, 220), (140, 100, 70), -1)
-        # Student reading
-        cv2.circle(img, (320, 260), 50, (160, 130, 110), -1)
-        cv2.rectangle(img, (270, 310), (370, 460), (40, 100, 160), -1)
-        # Laptop
-        cv2.rectangle(img, (290, 380), (350, 430), (50, 50, 50), -1)
-
     return img
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# RENDER — MAIN PAGE DISPATCHER
+# RENDER — MAIN DISPATCHER
 # ─────────────────────────────────────────────────────────────────────────────
 
 def render(page: str):
     """Render the AI Engineer Lab pages."""
+
+    # ── Session State for Live Stream ─────────────────────────────────────────
+    if "is_cam_streaming" not in st.session_state:
+        st.session_state.is_cam_streaming = False
 
     # ── Header Banner ─────────────────────────────────────────────────────────
     st.markdown("""
@@ -236,138 +229,257 @@ def render(page: str):
     """, unsafe_allow_html=True)
 
     # ═══════════════════════════════════════════════════════════════════════════
-    #  PAGE 1: LIVE SURVEILLANCE & DETECTION
+    #  PAGE 1: LIVE SURVEILLANCE & REAL-TIME DETECTION
     # ═══════════════════════════════════════════════════════════════════════════
     if "Live Surveillance" in page or "Detection" in page:
         st.markdown('<div class="page-title">Real-Time Object Detection &amp; Surveillance</div>', unsafe_allow_html=True)
-        st.markdown('<div class="page-subtitle">Live camera feed analysis, student behavior tracking, contraband detection, and ID-card verification</div>', unsafe_allow_html=True)
+        st.markdown('<div class="page-subtitle">Continuous live camera detection stream, student behavior tracking, contraband alerts, and ID compliance</div>', unsafe_allow_html=True)
 
         # ── Control Bar ─────────────────────────────────────────────────────────
         with st.container(border=True):
-            c_source, c_cam, c_conf = st.columns([2, 1.8, 1.8])
+            c_source, c_cam, c_conf = st.columns([2.4, 1.6, 1.8])
             with c_source:
                 input_mode = st.radio(
                     "Video Input Stream",
-                    ["📸 Live Camera Feed", "📁 Upload Image / CCTV Frame", "🏢 Exam Hall CCTV Preset"],
-                    horizontal=True,
+                    ["🎥 Continuous Live WebCam Stream", "📸 WebCam Snapshot", "📁 Upload Image / CCTV Frame", "🏢 Exam Hall CCTV Preset"],
+                    horizontal=False,
                     label_visibility="collapsed"
                 )
             with c_cam:
-                camera_id = st.selectbox("Active Camera Sensor", ["exam_hall_01", "exam_hall_02", "library_zone_a", "campus_gate_03"], label_visibility="collapsed")
+                camera_idx_sel = st.selectbox("Camera Hardware Device", ["Camera 0 (Default)", "Camera 1 (USB Cam)", "Camera 2 (External)"])
+                cam_index = int(camera_idx_sel.split()[1])
             with c_conf:
-                conf_slider = st.slider("Confidence Threshold", min_value=0.15, max_value=0.90, value=0.35, step=0.05)
+                conf_slider = st.slider("Detection Confidence", min_value=0.15, max_value=0.90, value=0.35, step=0.05)
 
-        # ── Input Feed Acquisition ──────────────────────────────────────────────
-        raw_img_bgr = None
-
-        if input_mode == "📸 Live Camera Feed":
+        # ─────────────────────────────────────────────────────────────────────
+        # MODE 1: CONTINUOUS LIVE WEBCAM STREAM
+        # ─────────────────────────────────────────────────────────────────────
+        if input_mode == "🎥 Continuous Live WebCam Stream":
             st.markdown("<div style='height: 0.4rem'></div>", unsafe_allow_html=True)
-            cam_picture = st.camera_input("📷 Capture Frame from Live Camera")
-            if cam_picture is not None:
-                bytes_data = cam_picture.getvalue()
-                raw_img_bgr = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-        elif input_mode == "📁 Upload Image / CCTV Frame":
-            uploaded_file = st.file_uploader("Upload Exam Hall, Classroom or Campus CCTV image", type=["jpg", "jpeg", "png", "webp"])
-            if uploaded_file is not None:
-                bytes_data = uploaded_file.read()
-                raw_img_bgr = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+            btn_col1, btn_col2, _ = st.columns([1.5, 1.5, 3])
+            with btn_col1:
+                start_btn = st.button("▶️ Start Live Camera Stream", type="primary", use_container_width=True, disabled=st.session_state.is_cam_streaming)
+            with btn_col2:
+                stop_btn = st.button("⏹️ Stop Camera Stream", type="secondary", use_container_width=True, disabled=not st.session_state.is_cam_streaming)
 
-        else: # Preset CCTV Demo
-            raw_img_bgr = generate_synthetic_cctv_frame("exam_hall")
+            if start_btn:
+                st.session_state.is_cam_streaming = True
+                st.rerun()
 
-        # ── Process and Display Detections ──────────────────────────────────────
-        if raw_img_bgr is not None:
-            with st.spinner("⚡ Running YOLOv8 detection & spatial association inference..."):
-                annotated_bgr, detections, violations, id_card_ok, latency_ms = process_vision_frame(
-                    raw_img_bgr, conf_thresh=conf_slider, camera_id=camera_id
-                )
+            if stop_btn:
+                st.session_state.is_cam_streaming = False
+                st.rerun()
 
-            # Convert BGR to RGB for Streamlit display
-            annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
+            # Dynamic placeholders
+            metrics_ph = st.empty()
+            feed_col1, feed_col2 = st.columns([3, 2], gap="large")
+            with feed_col1:
+                st.markdown('<div class="section-header">Live Annotated AI Video Stream</div>', unsafe_allow_html=True)
+                video_ph = st.empty()
+            with feed_col2:
+                st.markdown('<div class="section-header">Live Telemetry &amp; Alerts</div>', unsafe_allow_html=True)
+                alert_ph = st.empty()
+                table_ph = st.empty()
 
-            # ── Top Metrics Grid ────────────────────────────────────────────────
-            num_students = sum(1 for d in detections if d["class"] == "person")
-            num_contraband = len(violations)
+            if st.session_state.is_cam_streaming:
+                cap = cv2.VideoCapture(cam_index)
 
-            st.markdown(f"""
-            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:1.2rem;margin-bottom:1.5rem;">
-                <div class="stat-card">
-                    <div class="accent-bar" style="background:#2563eb;"></div>
-                    <div class="label">Students Detected</div>
-                    <div class="value">{num_students}</div>
-                    <div class="delta">Tracking active</div>
-                </div>
-                <div class="stat-card">
-                    <div class="accent-bar" style="background:{'#ef4444' if num_contraband > 0 else '#10b981'};"></div>
-                    <div class="label">Contraband Violations</div>
-                    <div class="value" style="color:{'#dc2626' if num_contraband > 0 else '#16a34a'};">{num_contraband}</div>
-                    <div class="delta">{'⚠️ Alert Triggered' if num_contraband > 0 else '✅ Hall Clear'}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="accent-bar" style="background:#10b981;"></div>
-                    <div class="label">ID Card Status</div>
-                    <div class="value" style="font-size:1.6rem;padding-top:4px;">{'✅ Verified' if id_card_ok else '⚠️ Check Required'}</div>
-                    <div class="delta">Compliance checked</div>
-                </div>
-                <div class="stat-card">
-                    <div class="accent-bar" style="background:#8b5cf6;"></div>
-                    <div class="label">Inference Latency</div>
-                    <div class="value">{latency_ms} ms</div>
-                    <div class="delta">Real-time edge speed</div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+                if not cap.isOpened():
+                    st.error(f"❌ Could not open Camera index {cam_index}. Please verify webcam permissions and ensure no other application is using it.")
+                    st.session_state.is_cam_streaming = False
+                else:
+                    fps_count = 0
+                    t_fps_start = time.time()
+                    current_fps = 30.0
 
-            # ── Split View: Annotated Visual + Telemetry ────────────────────────
-            v_col1, v_col2 = st.columns([3, 2], gap="large")
+                    try:
+                        while st.session_state.is_cam_streaming:
+                            ret, frame = cap.read()
+                            if not ret:
+                                st.warning("⚠️ End of video stream or failed to read frame from webcam.")
+                                break
 
-            with v_col1:
-                st.markdown('<div class="section-header">Live Annotated AI Detection Stream</div>', unsafe_allow_html=True)
-                st.image(annotated_rgb, use_container_width=True, caption=f"Active Sensor: {camera_id} · Model: YOLOv8 Nano · Inference: {latency_ms}ms")
+                            # Process frame through YOLO
+                            annotated_bgr, detections, violations, id_ok, lat_ms = process_vision_frame(
+                                frame, conf_thresh=conf_slider, camera_id=f"cam_{cam_index}"
+                            )
+                            annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
 
-            with v_col2:
-                st.markdown('<div class="section-header">Detection Telemetry &amp; Alerts</div>', unsafe_allow_html=True)
+                            # Calculate live FPS
+                            fps_count += 1
+                            if time.time() - t_fps_start >= 1.0:
+                                current_fps = round(fps_count / (time.time() - t_fps_start), 1)
+                                fps_count = 0
+                                t_fps_start = time.time()
 
-                if violations:
-                    for v in violations:
-                        st.markdown(f"""
-                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:0.8rem;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <div style="font-weight:700;color:#991b1b;font-size:0.92rem;">🚨 Malpractice / Contraband Alert</div>
-                                <span class="badge badge-red">{v['severity']}</span>
+                            # Draw FPS on frame
+                            cv2.putText(annotated_rgb, f"LIVE FPS: {current_fps} | {lat_ms}ms", (20, 35),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
+
+                            # Update video image placeholder
+                            video_ph.image(annotated_rgb, channels="RGB", use_container_width=True)
+
+                            # Update top metrics
+                            num_students = sum(1 for d in detections if d["class"] == "person")
+                            num_contraband = len(violations)
+                            metrics_ph.markdown(f"""
+                            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:0.8rem;margin-bottom:1.2rem;">
+                                <div class="stat-card">
+                                    <div class="accent-bar" style="background:#2563eb;"></div>
+                                    <div class="label">Students Tracked</div>
+                                    <div class="value">{num_students}</div>
+                                    <div class="delta">Real-time detection</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="accent-bar" style="background:{'#ef4444' if num_contraband > 0 else '#10b981'};"></div>
+                                    <div class="label">Contraband Alerts</div>
+                                    <div class="value" style="color:{'#dc2626' if num_contraband > 0 else '#16a34a'};">{num_contraband}</div>
+                                    <div class="delta">{'⚠️ Violation Detected' if num_contraband > 0 else '✅ Hall Clear'}</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="accent-bar" style="background:#10b981;"></div>
+                                    <div class="label">Live FPS</div>
+                                    <div class="value">{current_fps}</div>
+                                    <div class="delta">Inference: {lat_ms} ms</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="accent-bar" style="background:#8b5cf6;"></div>
+                                    <div class="label">ID Card Status</div>
+                                    <div class="value" style="font-size:1.55rem;padding-top:4px;">{'✅ Verified' if id_ok else '⚠️ Required'}</div>
+                                    <div class="delta">Compliance active</div>
+                                </div>
                             </div>
-                            <div style="font-size:0.82rem;color:#7f1d1d;margin-top:4px;">
-                                Detected <strong>{v['item'].upper()}</strong> ({v['confidence']}%) associated with <strong>Student #{v['student_index']}</strong>.
+                            """, unsafe_allow_html=True)
+
+                            # Update alerts
+                            if violations:
+                                alert_html = ""
+                                for v in violations:
+                                    alert_html += f"""
+                                    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:0.8rem 1.1rem;margin-bottom:0.6rem;">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                                            <div style="font-weight:700;color:#991b1b;font-size:0.88rem;">🚨 Malpractice Alert</div>
+                                            <span class="badge badge-red">{v['severity']}</span>
+                                        </div>
+                                        <div style="font-size:0.8rem;color:#7f1d1d;margin-top:3px;">
+                                            Detected <strong>{v['item'].upper()}</strong> ({v['confidence']}%) associated with Student #{v['student_index']}.
+                                        </div>
+                                    </div>
+                                    """
+                                alert_ph.markdown(alert_html, unsafe_allow_html=True)
+                            else:
+                                alert_ph.markdown("""
+                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:0.85rem 1.1rem;margin-bottom:0.6rem;color:#166534;font-size:0.86rem;font-weight:600;">
+                                    ✅ No contraband or spatial malpractice detected. Examination conditions normal.
+                                </div>
+                                """, unsafe_allow_html=True)
+
+                            # Update detection table
+                            if detections:
+                                df_d = pd.DataFrame(detections)[["class", "confidence", "xmin", "ymin", "xmax", "ymax"]]
+                                df_d.columns = ["Class", "Conf %", "X1", "Y1", "X2", "Y2"]
+                                table_ph.dataframe(df_d, use_container_width=True, hide_index=True)
+
+                            time.sleep(0.01)  # Smooth CPU yielding
+
+                    finally:
+                        cap.release()
+            else:
+                video_ph.info("💡 Click **'▶️ Start Live Camera Stream'** above to begin continuous real-time YOLO object and behavior tracking.")
+
+        # ─────────────────────────────────────────────────────────────────────
+        # MODE 2: SNAPSHOT / UPLOAD / PRESET
+        # ─────────────────────────────────────────────────────────────────────
+        else:
+            raw_img_bgr = None
+
+            if input_mode == "📸 WebCam Snapshot":
+                cam_picture = st.camera_input("📷 Capture Frame from Live Camera")
+                if cam_picture is not None:
+                    bytes_data = cam_picture.getvalue()
+                    raw_img_bgr = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+
+            elif input_mode == "📁 Upload Image / CCTV Frame":
+                uploaded_file = st.file_uploader("Upload Exam Hall or Campus CCTV Image", type=["jpg", "jpeg", "png", "webp"])
+                if uploaded_file is not None:
+                    bytes_data = uploaded_file.read()
+                    raw_img_bgr = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+
+            else:  # Preset CCTV Demo
+                raw_img_bgr = generate_synthetic_cctv_frame("exam_hall")
+
+            if raw_img_bgr is not None:
+                with st.spinner("⚡ Running YOLOv8 detection & spatial association inference..."):
+                    annotated_bgr, detections, violations, id_card_ok, latency_ms = process_vision_frame(
+                        raw_img_bgr, conf_thresh=conf_slider, camera_id="exam_hall_01"
+                    )
+
+                annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
+                num_students = sum(1 for d in detections if d["class"] == "person")
+                num_contraband = len(violations)
+
+                st.markdown(f"""
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:1.2rem;margin-bottom:1.5rem;">
+                    <div class="stat-card">
+                        <div class="accent-bar" style="background:#2563eb;"></div>
+                        <div class="label">Students Detected</div>
+                        <div class="value">{num_students}</div>
+                        <div class="delta">Tracking active</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="accent-bar" style="background:{'#ef4444' if num_contraband > 0 else '#10b981'};"></div>
+                        <div class="label">Contraband Violations</div>
+                        <div class="value" style="color:{'#dc2626' if num_contraband > 0 else '#16a34a'};">{num_contraband}</div>
+                        <div class="delta">{'⚠️ Alert Triggered' if num_contraband > 0 else '✅ Hall Clear'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="accent-bar" style="background:#10b981;"></div>
+                        <div class="label">ID Card Status</div>
+                        <div class="value" style="font-size:1.6rem;padding-top:4px;">{'✅ Verified' if id_card_ok else '⚠️ Check Required'}</div>
+                        <div class="delta">Compliance checked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="accent-bar" style="background:#8b5cf6;"></div>
+                        <div class="label">Inference Latency</div>
+                        <div class="value">{latency_ms} ms</div>
+                        <div class="delta">Real-time edge speed</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                v_col1, v_col2 = st.columns([3, 2], gap="large")
+                with v_col1:
+                    st.markdown('<div class="section-header">Annotated AI Detection Stream</div>', unsafe_allow_html=True)
+                    st.image(annotated_rgb, use_container_width=True, caption=f"Model: YOLOv8 Nano · Inference Latency: {latency_ms}ms")
+
+                with v_col2:
+                    st.markdown('<div class="section-header">Detection Telemetry &amp; Alerts</div>', unsafe_allow_html=True)
+                    if violations:
+                        for v in violations:
+                            st.markdown(f"""
+                            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:0.8rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;">
+                                    <div style="font-weight:700;color:#991b1b;font-size:0.92rem;">🚨 Malpractice / Contraband Alert</div>
+                                    <span class="badge badge-red">{v['severity']}</span>
+                                </div>
+                                <div style="font-size:0.82rem;color:#7f1d1d;margin-top:4px;">
+                                    Detected <strong>{v['item'].upper()}</strong> ({v['confidence']}%) associated with <strong>Student #{v['student_index']}</strong>.
+                                </div>
                             </div>
+                            """, unsafe_allow_html=True)
+                    else:
+                        st.markdown("""
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:0.8rem;color:#166534;font-size:0.88rem;font-weight:600;">
+                            ✅ No contraband or spatial malpractice detected. Examination conditions normal.
                         </div>
                         """, unsafe_allow_html=True)
-                else:
-                    st.markdown("""
-                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:0.9rem 1.2rem;margin-bottom:0.8rem;color:#166534;font-size:0.88rem;font-weight:600;">
-                        ✅ No contraband or spatial malpractice detected. Examination conditions normal.
-                    </div>
-                    """, unsafe_allow_html=True)
 
-                if detections:
-                    st.markdown('<div style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px;">Detected Entities</div>', unsafe_allow_html=True)
-                    df_det = pd.DataFrame(detections)[["class", "confidence", "xmin", "ymin", "xmax", "ymax"]]
-                    df_det.columns = ["Class", "Confidence %", "X1", "Y1", "X2", "Y2"]
-                    st.dataframe(df_det, use_container_width=True, hide_index=True)
-
-                with st.expander("🔍 View Raw Academic Telemetry JSON Payload"):
-                    st.json({
-                        "camera_id": camera_id,
-                        "timestamp": datetime.now().isoformat(),
-                        "students_count": num_students,
-                        "violations": violations,
-                        "id_card_detected": id_card_ok,
-                        "latency_ms": latency_ms,
-                        "model": "yolov8n.pt + best.pt"
-                    })
-
-        else:
-            st.info("👆 Please select an input stream (Live Camera, Upload, or Preset Demo) to start surveillance analysis.")
+                    if detections:
+                        st.markdown('<div style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px;">Detected Entities</div>', unsafe_allow_html=True)
+                        df_det = pd.DataFrame(detections)[["class", "confidence", "xmin", "ymin", "xmax", "ymax"]]
+                        df_det.columns = ["Class", "Confidence %", "X1", "Y1", "X2", "Y2"]
+                        st.dataframe(df_det, use_container_width=True, hide_index=True)
 
     # ═══════════════════════════════════════════════════════════════════════════
     #  PAGE 2: MODEL METRICS & BENCHMARKS
